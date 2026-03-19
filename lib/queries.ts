@@ -1,0 +1,261 @@
+import { supabase } from './supabase'
+import type { EscalationRow, FilterState, GroupedAccount, Stats } from '@/types'
+
+const PAGE_SIZE = 20
+
+export async function fetchStats(): Promise<Stats> {
+  // Fetch all non-closed escalations for stats
+  const [
+    openRes,
+    channelRes,
+    tierRes,
+    statusRes,
+    scoreDistRes,
+    oldestRes,
+    ownerRes,
+    allScoresRes,
+  ] = await Promise.all([
+    supabase
+      .from('escalations')
+      .select('priority_bucket, age_hours, sla_hours, score, dim_business, dim_time_age, dim_comms, dim_complexity, dim_risk, dim_ownership, dim_historical')
+      .neq('current_status', 'Closed'),
+    supabase
+      .from('escalations')
+      .select('channel, score')
+      .neq('current_status', 'Closed'),
+    supabase
+      .from('escalations')
+      .select('account_tier, score')
+      .neq('current_status', 'Closed'),
+    supabase
+      .from('escalations')
+      .select('current_status')
+      .neq('current_status', 'Closed'),
+    supabase
+      .from('escalations')
+      .select('score')
+      .neq('current_status', 'Closed'),
+    supabase
+      .from('escalations')
+      .select('*')
+      .neq('current_status', 'Closed')
+      .order('age_hours', { ascending: false })
+      .limit(5),
+    supabase
+      .from('escalations')
+      .select('owner, priority_bucket')
+      .neq('current_status', 'Closed'),
+    supabase
+      .from('escalations')
+      .select('channel, account_tier, sla_hours, age_hours')
+      .neq('current_status', 'Closed'),
+  ])
+
+  const openRows = openRes.data || []
+  const channelRows = channelRes.data || []
+  const tierRows = tierRes.data || []
+  const statusRows = statusRes.data || []
+  const scoreRows = scoreDistRes.data || []
+  const oldestCases = (oldestRes.data || []) as EscalationRow[]
+  const ownerRows = ownerRes.data || []
+  const allRows = allScoresRes.data || []
+
+  const totalOpen = openRows.length
+  const high = openRows.filter(r => r.priority_bucket === 'High').length
+  const medium = openRows.filter(r => r.priority_bucket === 'Medium').length
+  const low = openRows.filter(r => r.priority_bucket === 'Low').length
+  const blocked = statusRows.filter(r => r.current_status === 'Blocked').length
+  const slaBreach = allRows.filter(r => r.age_hours > (r.sla_hours || 24)).length
+  const avgAge = totalOpen > 0 ? openRows.reduce((s, r) => s + (r.age_hours || 0), 0) / totalOpen : 0
+
+  const byChannel = { WhatsApp: 0, Slack: 0, Email: 0 }
+  channelRows.forEach(r => {
+    if (r.channel in byChannel) byChannel[r.channel as keyof typeof byChannel]++
+  })
+
+  const byTier: Stats['byTier'] = { Enterprise: 0, 'Mid-Market': 0, SMB: 0 }
+  tierRows.forEach(r => {
+    if (r.account_tier in byTier) byTier[r.account_tier as keyof typeof byTier]++
+  })
+
+  const byStatus: Stats['byStatus'] = { Open: 0, Blocked: 0, 'In Progress': 0, Closed: 0 }
+  statusRows.forEach(r => {
+    if (r.current_status in byStatus) byStatus[r.current_status as keyof typeof byStatus]++
+  })
+
+  const scoreDistribution: Stats['scoreDistribution'] = {
+    '0-30': 0, '31-45': 0, '46-60': 0, '61-70': 0, '71-85': 0, '86-100': 0
+  }
+  scoreRows.forEach(r => {
+    const s = r.score || 0
+    if (s <= 30) scoreDistribution['0-30']++
+    else if (s <= 45) scoreDistribution['31-45']++
+    else if (s <= 60) scoreDistribution['46-60']++
+    else if (s <= 70) scoreDistribution['61-70']++
+    else if (s <= 85) scoreDistribution['71-85']++
+    else scoreDistribution['86-100']++
+  })
+
+  function avgScore(rows: Record<string, unknown>[], key: string, val: string) {
+    const filtered = rows.filter(r => r[key] === val)
+    if (!filtered.length) return 0
+    return Math.round(filtered.reduce((s: number, r) => s + ((r.score as number) || 0), 0) / filtered.length)
+  }
+
+  const avgScoreBySegment: Stats['avgScoreBySegment'] = {
+    Enterprise: avgScore(tierRows as Record<string, unknown>[], 'account_tier', 'Enterprise'),
+    'Mid-Market': avgScore(tierRows as Record<string, unknown>[], 'account_tier', 'Mid-Market'),
+    SMB: avgScore(tierRows as Record<string, unknown>[], 'account_tier', 'SMB'),
+    WhatsApp: avgScore(channelRows as Record<string, unknown>[], 'channel', 'WhatsApp'),
+    Slack: avgScore(channelRows as Record<string, unknown>[], 'channel', 'Slack'),
+    Email: avgScore(channelRows as Record<string, unknown>[], 'channel', 'Email'),
+  }
+
+  function dimAvg(field: string) {
+    const vals = openRows.map(r => (r as Record<string, number>)[field] || 0)
+    return vals.length ? Math.round((vals.reduce((a, b) => a + b, 0) / vals.length) * 10) / 10 : 0
+  }
+
+  const dimAverages: Stats['dimAverages'] = {
+    business: dimAvg('dim_business'),
+    timeAge: dimAvg('dim_time_age'),
+    comms: dimAvg('dim_comms'),
+    complexity: dimAvg('dim_complexity'),
+    risk: dimAvg('dim_risk'),
+    ownership: dimAvg('dim_ownership'),
+    historical: dimAvg('dim_historical'),
+  }
+
+  function slaBreachPct(rows: typeof allRows, key: string, val: string) {
+    const filtered = rows.filter((r: Record<string, unknown>) => r[key] === val)
+    if (!filtered.length) return 0
+    const breached = filtered.filter((r: Record<string, unknown>) => (r.age_hours as number) > ((r.sla_hours as number) || 24)).length
+    return Math.round((breached / filtered.length) * 100)
+  }
+
+  const slaBreachBySegment: Stats['slaBreachBySegment'] = {
+    Enterprise: slaBreachPct(allRows, 'account_tier', 'Enterprise'),
+    'Mid-Market': slaBreachPct(allRows, 'account_tier', 'Mid-Market'),
+    SMB: slaBreachPct(allRows, 'account_tier', 'SMB'),
+    WhatsApp: slaBreachPct(allRows, 'channel', 'WhatsApp'),
+    Slack: slaBreachPct(allRows, 'channel', 'Slack'),
+    Email: slaBreachPct(allRows, 'channel', 'Email'),
+  }
+
+  // Ownership load
+  const ownerMap: Record<string, { count: number; highCount: number }> = {}
+  ownerRows.forEach(r => {
+    const o = r.owner || '—'
+    if (!ownerMap[o]) ownerMap[o] = { count: 0, highCount: 0 }
+    ownerMap[o].count++
+    if (r.priority_bucket === 'High') ownerMap[o].highCount++
+  })
+  const ownershipLoad = Object.entries(ownerMap)
+    .map(([owner, { count, highCount }]) => ({ owner, count, highCount }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5)
+
+  return {
+    totalOpen,
+    high,
+    medium,
+    low,
+    blocked,
+    slaBreach,
+    avgAge,
+    byChannel,
+    byTier,
+    byStatus,
+    scoreDistribution,
+    avgScoreBySegment,
+    dimAverages,
+    slaBreachBySegment,
+    oldestCases,
+    ownershipLoad,
+  }
+}
+
+export async function fetchEscalations(
+  filters: FilterState
+): Promise<{ data: GroupedAccount[]; count: number }> {
+  let query = supabase.from('escalations').select('*', { count: 'exact' })
+
+  if (filters.priority) query = query.eq('priority_bucket', filters.priority)
+  if (filters.status) query = query.eq('current_status', filters.status)
+  if (filters.channel) query = query.eq('channel', filters.channel)
+  if (filters.tier) query = query.eq('account_tier', filters.tier)
+  if (filters.owner) query = query.eq('owner', filters.owner)
+  if (filters.scoreRange) {
+    query = query.gte('score', filters.scoreRange[0]).lte('score', filters.scoreRange[1])
+  }
+  if (filters.search) {
+    query = query.or(
+      `account_name.ilike.%${filters.search}%,ai_summary.ilike.%${filters.search}%`
+    )
+  }
+
+  switch (filters.sortBy) {
+    case 'score_desc': query = query.order('score', { ascending: false }); break
+    case 'age_desc': query = query.order('age_hours', { ascending: false }); break
+    case 'age_asc': query = query.order('age_hours', { ascending: true }); break
+    case 'account_asc': query = query.order('account_name', { ascending: true }); break
+  }
+
+  const { data, count, error } = await query
+
+  if (error) throw error
+
+  const rows = (data || []) as EscalationRow[]
+
+  // Group by account name
+  const accountMap: Record<string, EscalationRow[]> = {}
+  rows.forEach(row => {
+    if (!accountMap[row.account_name]) accountMap[row.account_name] = []
+    accountMap[row.account_name].push(row)
+  })
+
+  const grouped: GroupedAccount[] = Object.entries(accountMap).map(([name, escs]) => {
+    const top = escs[0]
+    const allFlags = Array.from(new Set(escs.flatMap(e => e.risk_flags || [])))
+    return {
+      name,
+      escalations: escs,
+      topScore: top.score,
+      topPriority: top.priority_bucket,
+      topStatus: top.current_status,
+      topChannel: top.channel,
+      topHint: top.priority_hint,
+      riskFlags: allFlags,
+      aiSummary: top.ai_summary,
+    }
+  })
+
+  // Paginate grouped accounts
+  const page = filters.page || 1
+  const totalGroups = grouped.length
+  const paginated = grouped.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+
+  return { data: paginated, count: totalGroups }
+}
+
+export async function fetchAccountEscalations(accountName: string): Promise<EscalationRow[]> {
+  const { data, error } = await supabase
+    .from('escalations')
+    .select('*')
+    .eq('account_name', accountName)
+    .order('score', { ascending: false })
+
+  if (error) throw error
+  return (data || []) as EscalationRow[]
+}
+
+export async function fetchOwners(): Promise<string[]> {
+  const { data } = await supabase
+    .from('escalations')
+    .select('owner')
+    .neq('owner', '—')
+    .neq('current_status', 'Closed')
+
+  const owners = Array.from(new Set((data || []).map(r => r.owner))).filter(Boolean).sort() as string[]
+  return owners
+}

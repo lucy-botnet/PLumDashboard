@@ -4,6 +4,7 @@ import { create } from 'zustand'
 import type { FilterState } from '@/types'
 
 interface AppStore extends FilterState {
+  _refreshKey: number
   setFilter: (key: keyof FilterState, value: unknown) => void
   clearFilter: (key: keyof FilterState) => void
   clearAllFilters: () => void
@@ -70,6 +71,7 @@ function readFromUrl(): Partial<FilterState> {
 
 export const useAppStore = create<AppStore>((set, get) => ({
   ...defaultFilters,
+  _refreshKey: 0,
   setFilter: (key, value) => {
     const newState = { ...get(), [key]: value, page: key === 'page' ? (value as number) : 1 }
     set(newState)
@@ -82,7 +84,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
     syncToUrl(newState)
   },
   clearAllFilters: () => {
-    set({ ...defaultFilters })
+    const newState = { ...defaultFilters, _refreshKey: get()._refreshKey + 1 }
+    set(newState)
     syncToUrl(defaultFilters)
   },
   setPage: (page) => {

@@ -55,6 +55,7 @@ export default function DetailPageContent() {
     sortBy: store.sortBy,
     search: store.search,
     page: store.page,
+    _refreshKey: store._refreshKey,
   })
 
   useEffect(() => {

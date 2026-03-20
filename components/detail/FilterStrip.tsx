@@ -44,10 +44,17 @@ export default function FilterStrip({ totalAccounts, totalEscalations, owners }:
   const store = useAppStore()
   const [searchInput, setSearchInput] = useState(store.search || '')
 
+  // Sync local input when store.search is cleared externally (e.g. clearAllFilters)
+  useEffect(() => {
+    setSearchInput(store.search || '')
+  }, [store.search]) // eslint-disable-line react-hooks/exhaustive-deps
+
   // Debounce search
   useEffect(() => {
     const timer = setTimeout(() => {
-      store.setFilter('search', searchInput)
+      if (searchInput !== store.search) {
+        store.setFilter('search', searchInput)
+      }
     }, 300)
     return () => clearTimeout(timer)
   }, [searchInput]) // eslint-disable-line react-hooks/exhaustive-deps

@@ -13,43 +13,42 @@ const SORT_OPTIONS = [
   { value: 'score_desc', label: 'Score ↓' },
   { value: 'age_desc', label: 'Age ↓' },
   { value: 'age_asc', label: 'Age ↑' },
-  { value: 'account_asc', label: 'Account A→Z' },
+  { value: 'account_asc', label: 'A→Z' },
 ] as const
 
-const selectStyle = {
+const selectStyle: React.CSSProperties = {
   fontWeight: 400,
   fontSize: 12,
-  padding: '6px 10px',
-  border: '1px solid #E5E7EB',
+  padding: '7px 10px',
+  border: '1px solid #EDE8FD',
   borderRadius: 8,
   backgroundColor: 'white',
-  color: '#111827',
+  color: '#1A0A2B',
   fontFamily: 'Inter, sans-serif',
   outline: 'none',
   cursor: 'pointer',
+  transition: 'border-color 150ms',
 }
 
-const labelStyle = {
-  fontWeight: 500,
-  fontSize: 10,
-  color: '#9CA3AF',
-  textTransform: 'uppercase' as const,
-  letterSpacing: '0.08em',
+const labelStyle: React.CSSProperties = {
+  fontWeight: 600,
+  fontSize: 9,
+  color: '#9E94BC',
+  textTransform: 'uppercase',
+  letterSpacing: '0.1em',
   fontFamily: 'Inter, sans-serif',
   display: 'block',
-  marginBottom: 4,
+  marginBottom: 5,
 }
 
 export default function FilterStrip({ totalAccounts, totalEscalations, owners }: Props) {
   const store = useAppStore()
   const [searchInput, setSearchInput] = useState(store.search || '')
 
-  // Sync local input when store.search is cleared externally (e.g. clearAllFilters)
   useEffect(() => {
     setSearchInput(store.search || '')
   }, [store.search]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Debounce search
   useEffect(() => {
     const timer = setTimeout(() => {
       if (searchInput !== store.search) {
@@ -66,8 +65,16 @@ export default function FilterStrip({ totalAccounts, totalEscalations, owners }:
   return (
     <>
       <div
-        className="w-full flex items-end gap-3 flex-wrap px-6 py-3 border-b"
-        style={{ backgroundColor: '#F9FAFB', borderBottomColor: '#E5E7EB' }}
+        style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'flex-end',
+          gap: 10,
+          flexWrap: 'wrap',
+          padding: '12px 20px',
+          borderBottom: '1px solid #EDE8FD',
+          backgroundColor: 'white',
+        }}
       >
         {/* Priority */}
         <div>
@@ -77,9 +84,7 @@ export default function FilterStrip({ totalAccounts, totalEscalations, owners }:
             value={store.priority || 'All'}
             onChange={e => handleSelect('priority', e.target.value)}
           >
-            {['All', 'High', 'Medium', 'Low'].map(v => (
-              <option key={v}>{v}</option>
-            ))}
+            {['All', 'High', 'Medium', 'Low'].map(v => <option key={v}>{v}</option>)}
           </select>
         </div>
 
@@ -91,9 +96,7 @@ export default function FilterStrip({ totalAccounts, totalEscalations, owners }:
             value={store.status || 'All'}
             onChange={e => handleSelect('status', e.target.value)}
           >
-            {['All', 'Blocked', 'Open', 'In Progress', 'Closed'].map(v => (
-              <option key={v}>{v}</option>
-            ))}
+            {['All', 'Blocked', 'Open', 'In Progress', 'Closed'].map(v => <option key={v}>{v}</option>)}
           </select>
         </div>
 
@@ -105,9 +108,7 @@ export default function FilterStrip({ totalAccounts, totalEscalations, owners }:
             value={store.channel || 'All'}
             onChange={e => handleSelect('channel', e.target.value)}
           >
-            {['All', 'WhatsApp', 'Slack', 'Email'].map(v => (
-              <option key={v}>{v}</option>
-            ))}
+            {['All', 'WhatsApp', 'Slack', 'Email'].map(v => <option key={v}>{v}</option>)}
           </select>
         </div>
 
@@ -119,9 +120,7 @@ export default function FilterStrip({ totalAccounts, totalEscalations, owners }:
             value={store.tier || 'All'}
             onChange={e => handleSelect('tier', e.target.value)}
           >
-            {['All', 'Enterprise', 'Mid-Market', 'SMB'].map(v => (
-              <option key={v}>{v}</option>
-            ))}
+            {['All', 'Enterprise', 'Mid-Market', 'SMB'].map(v => <option key={v}>{v}</option>)}
           </select>
         </div>
 
@@ -139,7 +138,7 @@ export default function FilterStrip({ totalAccounts, totalEscalations, owners }:
         </div>
 
         {/* Search */}
-        <div style={{ flex: 1, minWidth: 176 }}>
+        <div style={{ flex: 1, minWidth: 180 }}>
           <label style={labelStyle}>Search</label>
           <input
             type="text"
@@ -151,23 +150,25 @@ export default function FilterStrip({ totalAccounts, totalEscalations, owners }:
               width: '100%',
               boxSizing: 'border-box',
             }}
+            onFocus={e => ((e.target as HTMLInputElement).style.borderColor = '#7308E3')}
+            onBlur={e => ((e.target as HTMLInputElement).style.borderColor = '#EDE8FD')}
           />
         </div>
 
-        {/* Sort tabs */}
-        <div className="ml-auto flex gap-1 items-end pb-0.5">
+        {/* Sort */}
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: 4, alignItems: 'flex-end', paddingBottom: 1 }}>
           {SORT_OPTIONS.map(opt => (
             <button
               key={opt.value}
               onClick={() => store.setFilter('sortBy', opt.value)}
               style={{
-                fontWeight: store.sortBy === opt.value ? 500 : 400,
-                fontSize: 12,
-                padding: '4px 12px',
+                fontWeight: store.sortBy === opt.value ? 600 : 400,
+                fontSize: 11,
+                padding: '5px 12px',
                 borderRadius: 20,
-                border: store.sortBy === opt.value ? 'none' : '1px solid #E5E7EB',
-                backgroundColor: store.sortBy === opt.value ? '#111827' : 'transparent',
-                color: store.sortBy === opt.value ? 'white' : '#6B7280',
+                border: store.sortBy === opt.value ? '1.5px solid #7308E3' : '1px solid #EDE8FD',
+                backgroundColor: store.sortBy === opt.value ? '#7308E3' : 'white',
+                color: store.sortBy === opt.value ? 'white' : '#6B5E8B',
                 fontFamily: 'Inter, sans-serif',
                 cursor: 'pointer',
                 transition: 'all 150ms',
@@ -179,13 +180,29 @@ export default function FilterStrip({ totalAccounts, totalEscalations, owners }:
         </div>
       </div>
 
-      {/* Results row */}
+      {/* Results count */}
       <div
-        className="px-6 py-2 border-b"
-        style={{ backgroundColor: 'white', borderBottomColor: '#E5E7EB' }}
+        style={{
+          padding: '7px 20px',
+          borderBottom: '1px solid #EDE8FD',
+          backgroundColor: '#FDFCFF',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+        }}
       >
-        <span style={{ fontWeight: 400, fontSize: 12, color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
-          {totalAccounts.toLocaleString()} accounts · {totalEscalations.toLocaleString()} escalations
+        <div
+          style={{
+            width: 6,
+            height: 6,
+            borderRadius: '50%',
+            backgroundColor: '#7308E3',
+          }}
+        />
+        <span style={{ fontWeight: 400, fontSize: 12, color: '#6B5E8B', fontFamily: 'Inter, sans-serif' }}>
+          <strong style={{ color: '#1A0A2B', fontWeight: 600 }}>{totalAccounts.toLocaleString()}</strong> accounts
+          {' · '}
+          <strong style={{ color: '#1A0A2B', fontWeight: 600 }}>{totalEscalations.toLocaleString()}</strong> escalations
         </span>
       </div>
     </>

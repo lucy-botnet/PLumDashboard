@@ -11,22 +11,22 @@ interface Props {
 }
 
 const PRIORITY_COLORS = {
-  High: { text: '#DC2626', bg: '#FCEBEB', border: '#F09595' },
+  High:   { text: '#E53030', bg: '#FDEAEA', border: '#FCA5A5' },
   Medium: { text: '#D97706', bg: '#FEF3C7', border: '#FCD34D' },
-  Low: { text: '#059669', bg: '#D1FAE5', border: '#6EE7B7' },
+  Low:    { text: '#059669', bg: '#D1FAE5', border: '#6EE7B7' },
 }
 
 const STATUS_COLORS = {
-  Blocked: { text: '#DC2626', bg: '#FCEBEB' },
-  Open: { text: '#D97706', bg: '#FEF3C7' },
-  'In Progress': { text: '#4F46E5', bg: '#EEF2FF' },
-  Closed: { text: '#059669', bg: '#D1FAE5' },
+  Blocked:      { text: '#E53030', bg: '#FDEAEA' },
+  Open:         { text: '#D97706', bg: '#FEF3C7' },
+  'In Progress':{ text: '#7308E3', bg: '#EDE8FD' },
+  Closed:       { text: '#059669', bg: '#D1FAE5' },
 }
 
 const CHANNEL_COLORS = {
   WhatsApp: { text: '#059669', bg: '#D1FAE5', border: '#6EE7B7' },
-  Slack: { text: '#4F46E5', bg: '#EEF2FF', border: '#C7D2FE' },
-  Email: { text: '#7C3AED', bg: '#EDE9FE', border: '#C4B5FD' },
+  Slack:    { text: '#7308E3', bg: '#EDE8FD', border: '#C4B5FD' },
+  Email:    { text: '#9B3FF5', bg: '#F3E8FF', border: '#DDD6FE' },
 }
 
 function Pill({ label, colors }: { label: string; colors: { text: string; bg: string; border?: string } }) {
@@ -34,13 +34,14 @@ function Pill({ label, colors }: { label: string; colors: { text: string; bg: st
     <span
       style={{
         fontSize: 10,
-        fontWeight: 500,
+        fontWeight: 600,
         fontFamily: 'Inter, sans-serif',
         color: colors.text,
         backgroundColor: colors.bg,
-        border: `0.5px solid ${colors.border || colors.bg}`,
+        border: `1px solid ${colors.border || colors.bg}`,
         borderRadius: 20,
         padding: '2px 8px',
+        letterSpacing: '0.01em',
       }}
     >
       {label}
@@ -48,13 +49,12 @@ function Pill({ label, colors }: { label: string; colors: { text: string; bg: st
   )
 }
 
-function EscalationRow({ esc, onDraft }: { esc: EscalationRow; onDraft: (e: EscalationRow) => void }) {
+function EscalationItem({ esc, onDraft }: { esc: EscalationRow; onDraft: (e: EscalationRow) => void }) {
   const pColors = PRIORITY_COLORS[esc.priority_bucket] || PRIORITY_COLORS.Low
   const sColors = STATUS_COLORS[esc.current_status] || STATUS_COLORS.Open
   const cColors = CHANNEL_COLORS[esc.channel] || CHANNEL_COLORS.Email
   const ageDays = Math.round((esc.age_hours || 0) / 24)
 
-  // Build message summary: prefer ai_summary, fall back to message text (truncated)
   const summary = esc.ai_summary
     ? esc.ai_summary
     : esc.message
@@ -65,39 +65,39 @@ function EscalationRow({ esc, onDraft }: { esc: EscalationRow; onDraft: (e: Esca
   return (
     <div
       className="border-b last:border-b-0 transition-colors"
-      style={{ borderBottomColor: '#E5E7EB' }}
-      onMouseEnter={e => ((e.currentTarget as HTMLElement).style.backgroundColor = 'white')}
+      style={{ borderBottomColor: '#EDE8FD' }}
+      onMouseEnter={e => ((e.currentTarget as HTMLElement).style.backgroundColor = '#FDFCFF')}
       onMouseLeave={e => ((e.currentTarget as HTMLElement).style.backgroundColor = 'transparent')}
     >
-      {/* Top row: ID / pills / score / draft */}
-      <div className="flex items-center gap-3 px-5 pt-2.5 pb-1">
-        <span style={{ fontWeight: 500, fontSize: 11, color: '#9CA3AF', width: 80, flexShrink: 0, fontFamily: 'Inter, sans-serif' }}>
+      {/* Row: ID / subject / pills / score / draft */}
+      <div className="flex items-center gap-3 px-5 pt-3 pb-1">
+        <span style={{ fontWeight: 500, fontSize: 10, color: '#9E94BC', width: 80, flexShrink: 0, fontFamily: 'Inter, sans-serif', letterSpacing: '0.04em' }}>
           {esc.escalation_id}
         </span>
         <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 500, fontSize: 12, color: '#111827', fontFamily: 'Inter, sans-serif', textTransform: 'capitalize' }}>
+          <div style={{ fontWeight: 500, fontSize: 12, color: '#1A0A2B', fontFamily: 'Inter, sans-serif', textTransform: 'capitalize' }}>
             {esc.subject || esc.priority_hint || 'general'}
           </div>
-          <div className="flex gap-1 mt-0.5">
+          <div className="flex gap-1 mt-1">
             <Pill label={esc.channel} colors={cColors} />
             <Pill label={esc.current_status} colors={sColors} />
           </div>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
-          <span style={{ fontWeight: 600, fontSize: 12, color: pColors.text, fontFamily: 'Inter, sans-serif' }}>
+          <span style={{ fontWeight: 700, fontSize: 13, color: pColors.text, fontFamily: 'Inter, sans-serif' }}>
             {esc.score}
           </span>
-          <span style={{ fontWeight: 400, fontSize: 11, color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
+          <span style={{ fontWeight: 400, fontSize: 11, color: '#9E94BC', fontFamily: 'Inter, sans-serif' }}>
             {ageDays}d
           </span>
           <button
             onClick={e => { e.stopPropagation(); onDraft(esc) }}
             style={{
-              fontWeight: 500,
+              fontWeight: 600,
               fontSize: 11,
               padding: '4px 10px',
-              border: '1px solid #4F46E5',
-              color: '#4F46E5',
+              border: '1.5px solid #7308E3',
+              color: '#7308E3',
               borderRadius: 6,
               backgroundColor: 'transparent',
               cursor: 'pointer',
@@ -105,12 +105,12 @@ function EscalationRow({ esc, onDraft }: { esc: EscalationRow; onDraft: (e: Esca
               transition: 'all 150ms',
             }}
             onMouseEnter={e => {
-              ;(e.currentTarget as HTMLButtonElement).style.backgroundColor = '#4F46E5'
+              ;(e.currentTarget as HTMLButtonElement).style.backgroundColor = '#7308E3'
               ;(e.currentTarget as HTMLButtonElement).style.color = 'white'
             }}
             onMouseLeave={e => {
               ;(e.currentTarget as HTMLButtonElement).style.backgroundColor = 'transparent'
-              ;(e.currentTarget as HTMLButtonElement).style.color = '#4F46E5'
+              ;(e.currentTarget as HTMLButtonElement).style.color = '#7308E3'
             }}
           >
             Draft
@@ -123,14 +123,14 @@ function EscalationRow({ esc, onDraft }: { esc: EscalationRow; onDraft: (e: Esca
           style={{
             marginLeft: 100,
             marginRight: 16,
-            marginBottom: 8,
-            padding: '6px 10px',
-            backgroundColor: '#F9FAFB',
+            marginBottom: 10,
+            padding: '6px 12px',
+            backgroundColor: '#F6F3FF',
             borderRadius: 6,
-            borderLeft: '2px solid #E5E7EB',
+            borderLeft: '2px solid #D9D0F8',
           }}
         >
-          <span style={{ fontSize: 11, fontWeight: 400, color: '#6B7280', fontFamily: 'Inter, sans-serif', lineHeight: 1.55 }}>
+          <span style={{ fontSize: 11, fontWeight: 400, color: '#6B5E8B', fontFamily: 'Inter, sans-serif', lineHeight: 1.55 }}>
             {summaryPreview}
           </span>
         </div>
@@ -162,40 +162,43 @@ export default function RecordCard({ account, isExpanded, onToggle, onDraft }: P
       className={isExpanded ? '' : 'card-lift'}
       style={{
         backgroundColor: 'white',
-        borderRadius: isBlocked && isHighPriority ? '0 12px 12px 0' : 12,
-        border: isExpanded ? '1px solid #4F46E5' : '1px solid #E5E7EB',
-        borderLeft: isBlocked && isHighPriority ? '3px solid #DC2626' : (isExpanded ? '1px solid #4F46E5' : '1px solid #E5E7EB'),
+        borderRadius: 12,
+        border: isExpanded ? '1.5px solid #7308E3' : `1px solid ${isBlocked && isHighPriority ? '#FCA5A5' : '#EDE8FD'}`,
+        borderLeft: isBlocked && isHighPriority
+          ? '3px solid #E53030'
+          : isExpanded
+          ? '1.5px solid #7308E3'
+          : '1px solid #EDE8FD',
         overflow: 'hidden',
         transition: 'border-color 150ms, box-shadow 200ms',
-        boxShadow: isExpanded ? '0 0 0 2px rgba(79,70,229,0.12)' : '0 1px 3px rgba(0,0,0,0.08)',
+        boxShadow: isExpanded
+          ? '0 0 0 3px rgba(115,8,227,0.10), 0 4px 20px rgba(115,8,227,0.08)'
+          : '0 1px 4px rgba(115,8,227,0.06)',
       }}
     >
-      {/* Main card section */}
+      {/* Main card header */}
       <div
         className="cursor-pointer"
         style={{ padding: '16px 20px' }}
         onClick={() => onToggle(account.name)}
       >
-        {/* Row 1: Account header */}
+        {/* Row 1: Account name + meta */}
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-2 flex-1">
             {/* Chevron */}
             <svg
-              width="12"
-              height="12"
-              viewBox="0 0 12 12"
-              fill="none"
+              width="12" height="12" viewBox="0 0 12 12" fill="none"
               style={{
                 transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
                 transition: 'transform 200ms',
-                color: '#6B7280',
+                color: '#9E94BC',
                 flexShrink: 0,
               }}
             >
               <path d="M4 2L8 6L4 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
 
-            <span style={{ fontWeight: 500, fontSize: 14, color: '#111827', fontFamily: 'Inter, sans-serif' }}>
+            <span style={{ fontWeight: 600, fontSize: 14, color: '#1A0A2B', fontFamily: 'Inter, sans-serif', letterSpacing: '-0.1px' }}>
               {account.name}
             </span>
 
@@ -203,10 +206,10 @@ export default function RecordCard({ account, isExpanded, onToggle, onDraft }: P
               <span
                 style={{
                   fontSize: 10,
-                  fontWeight: 500,
-                  color: '#6B7280',
-                  backgroundColor: '#F3F4F6',
-                  border: '1px solid #E5E7EB',
+                  fontWeight: 600,
+                  color: '#7308E3',
+                  backgroundColor: '#EDE8FD',
+                  border: '1px solid #D9D0F8',
                   borderRadius: 20,
                   padding: '1px 8px',
                   fontFamily: 'Inter, sans-serif',
@@ -218,41 +221,42 @@ export default function RecordCard({ account, isExpanded, onToggle, onDraft }: P
 
             {/* Risk flags */}
             {account.riskFlags.includes('churn') && (
-              <span style={{ fontSize: 10, fontWeight: 500, color: '#DC2626', backgroundColor: '#FCEBEB', border: '0.5px solid #F09595', borderRadius: 20, padding: '1px 8px', fontFamily: 'Inter, sans-serif' }}>
+              <span style={{ fontSize: 10, fontWeight: 600, color: '#E53030', backgroundColor: '#FDEAEA', border: '1px solid #FCA5A5', borderRadius: 20, padding: '1px 8px', fontFamily: 'Inter, sans-serif' }}>
                 Churn risk
               </span>
             )}
             {account.riskFlags.includes('legal') && (
-              <span style={{ fontSize: 10, fontWeight: 500, color: '#DC2626', backgroundColor: '#FCEBEB', border: '0.5px solid #F09595', borderRadius: 20, padding: '1px 8px', fontFamily: 'Inter, sans-serif' }}>
+              <span style={{ fontSize: 10, fontWeight: 600, color: '#E53030', backgroundColor: '#FDEAEA', border: '1px solid #FCA5A5', borderRadius: 20, padding: '1px 8px', fontFamily: 'Inter, sans-serif' }}>
                 Legal
               </span>
             )}
             {account.riskFlags.includes('social') && (
-              <span style={{ fontSize: 10, fontWeight: 500, color: '#D97706', backgroundColor: '#FAEEDA', border: '0.5px solid #FAC775', borderRadius: 20, padding: '1px 8px', fontFamily: 'Inter, sans-serif' }}>
+              <span style={{ fontSize: 10, fontWeight: 600, color: '#D97706', backgroundColor: '#FEF3C7', border: '1px solid #FCD34D', borderRadius: 20, padding: '1px 8px', fontFamily: 'Inter, sans-serif' }}>
                 Social
               </span>
             )}
           </div>
 
-          <div className="flex flex-col items-end gap-1">
-            <div className="flex flex-col items-end" style={{ gap: 1 }}>
-              <span style={{ fontSize: 9, fontWeight: 500, color: '#9CA3AF', fontFamily: 'Inter, sans-serif', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          {/* Risk score */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: 9, fontWeight: 600, color: '#9E94BC', fontFamily: 'Inter, sans-serif', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 1 }}>
                 Risk score
-              </span>
-              <span style={{ fontWeight: 700, fontSize: 24, color: pColors.text, fontFamily: 'Inter, sans-serif', lineHeight: 1 }}>
+              </div>
+              <div style={{ fontWeight: 800, fontSize: 28, color: pColors.text, fontFamily: 'Inter, sans-serif', lineHeight: 1, letterSpacing: '-1px' }}>
                 {account.topScore}
-              </span>
+              </div>
             </div>
             <span
               className={isHighPriority ? 'pulse-badge' : ''}
               style={{
                 fontSize: 11,
-                fontWeight: 500,
+                fontWeight: 600,
                 color: pColors.text,
                 backgroundColor: pColors.bg,
-                border: `0.5px solid ${pColors.border}`,
+                border: `1px solid ${pColors.border}`,
                 borderRadius: 20,
-                padding: '4px 10px',
+                padding: '3px 10px',
                 fontFamily: 'Inter, sans-serif',
               }}
             >
@@ -265,11 +269,11 @@ export default function RecordCard({ account, isExpanded, onToggle, onDraft }: P
         {account.aiSummary && (
           <div
             style={{
-              marginTop: 8,
+              marginTop: 10,
               marginLeft: 20,
               fontWeight: 400,
               fontSize: 12,
-              color: '#6B7280',
+              color: '#6B5E8B',
               lineHeight: 1.6,
               fontFamily: 'Inter, sans-serif',
               display: '-webkit-box',
@@ -282,28 +286,26 @@ export default function RecordCard({ account, isExpanded, onToggle, onDraft }: P
           </div>
         )}
 
-        {/* Row 3: Metadata + Actions */}
+        {/* Row 3: Tags + Actions */}
         <div
           className="flex justify-between items-center flex-wrap gap-2 mt-3 pt-3"
-          style={{ borderTop: '1px solid #E5E7EB' }}
+          style={{ borderTop: '1px solid #EDE8FD' }}
         >
-          {/* Tags */}
           <div className="flex gap-1.5 flex-wrap">
             <Pill label={account.topChannel} colors={cColors} />
             <Pill label={account.topStatus} colors={sColors} />
-            <Pill label={topEsc?.account_tier || ''} colors={{ text: '#6B7280', bg: '#F3F4F6' }} />
+            <Pill label={topEsc?.account_tier || ''} colors={{ text: '#6B5E8B', bg: '#F6F3FF', border: '#EDE8FD' }} />
             {topEsc?.priority_hint && (
-              <Pill label={topEsc.priority_hint} colors={{ text: '#6B7280', bg: '#F3F4F6' }} />
+              <Pill label={topEsc.priority_hint} colors={{ text: '#6B5E8B', bg: '#F6F3FF', border: '#EDE8FD' }} />
             )}
           </div>
 
-          {/* Actions */}
           <div className="flex items-center gap-3">
             <span
               style={{
                 fontWeight: 400,
                 fontSize: 12,
-                color: topEsc?.owner === '—' ? '#DC2626' : '#6B7280',
+                color: topEsc?.owner === '—' ? '#E53030' : '#6B5E8B',
                 fontFamily: 'Inter, sans-serif',
               }}
             >
@@ -311,9 +313,9 @@ export default function RecordCard({ account, isExpanded, onToggle, onDraft }: P
             </span>
             <span
               style={{
-                fontWeight: 600,
+                fontWeight: 700,
                 fontSize: 12,
-                color: ageDays > 2 ? '#DC2626' : '#059669',
+                color: ageDays > 2 ? '#E53030' : '#059669',
                 fontFamily: 'Inter, sans-serif',
               }}
             >
@@ -323,11 +325,11 @@ export default function RecordCard({ account, isExpanded, onToggle, onDraft }: P
               <button
                 onClick={e => { e.stopPropagation(); onDraft(topEsc) }}
                 style={{
-                  fontWeight: 500,
+                  fontWeight: 600,
                   fontSize: 12,
-                  padding: '6px 12px',
-                  border: '1px solid #4F46E5',
-                  color: '#4F46E5',
+                  padding: '6px 14px',
+                  border: '1.5px solid #7308E3',
+                  color: '#7308E3',
                   borderRadius: 8,
                   backgroundColor: 'transparent',
                   cursor: 'pointer',
@@ -335,12 +337,14 @@ export default function RecordCard({ account, isExpanded, onToggle, onDraft }: P
                   transition: 'all 150ms',
                 }}
                 onMouseEnter={e => {
-                  ;(e.currentTarget as HTMLButtonElement).style.backgroundColor = '#4F46E5'
+                  ;(e.currentTarget as HTMLButtonElement).style.backgroundColor = '#7308E3'
                   ;(e.currentTarget as HTMLButtonElement).style.color = 'white'
+                  ;(e.currentTarget as HTMLButtonElement).style.boxShadow = '0 2px 8px rgba(115,8,227,0.3)'
                 }}
                 onMouseLeave={e => {
                   ;(e.currentTarget as HTMLButtonElement).style.backgroundColor = 'transparent'
-                  ;(e.currentTarget as HTMLButtonElement).style.color = '#4F46E5'
+                  ;(e.currentTarget as HTMLButtonElement).style.color = '#7308E3'
+                  ;(e.currentTarget as HTMLButtonElement).style.boxShadow = 'none'
                 }}
               >
                 Draft reply
@@ -350,37 +354,37 @@ export default function RecordCard({ account, isExpanded, onToggle, onDraft }: P
         </div>
       </div>
 
-      {/* Drilldown Panel */}
+      {/* Drilldown panel */}
       <div
         ref={panelRef}
         style={{
           maxHeight: isExpanded ? `${Math.max(panelHeight, 200)}px` : 0,
           overflow: 'hidden',
           transition: 'max-height 250ms ease-in-out',
-          backgroundColor: '#F9FAFB',
-          borderTop: isExpanded ? '1px solid #E5E7EB' : 'none',
+          backgroundColor: '#FDFCFF',
+          borderTop: isExpanded ? '1px solid #EDE8FD' : 'none',
         }}
       >
         <div className="flex justify-between items-center px-5 py-3">
           <span
             style={{
-              fontWeight: 500,
-              fontSize: 11,
+              fontWeight: 600,
+              fontSize: 10,
               textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              color: '#6B7280',
+              letterSpacing: '0.1em',
+              color: '#9E94BC',
               fontFamily: 'Inter, sans-serif',
             }}
           >
-            All escalations from {account.name}
+            All escalations · {account.name}
           </span>
-          <span style={{ fontSize: 11, color: '#9CA3AF', fontFamily: 'Inter, sans-serif' }}>
+          <span style={{ fontSize: 11, color: '#9E94BC', fontFamily: 'Inter, sans-serif' }}>
             {account.escalations.length} total
           </span>
         </div>
 
         {account.escalations.map(esc => (
-          <EscalationRow key={esc.id} esc={esc} onDraft={onDraft} />
+          <EscalationItem key={esc.id} esc={esc} onDraft={onDraft} />
         ))}
       </div>
     </div>

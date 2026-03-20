@@ -25,9 +25,9 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
   const d = payload[0].payload
   const pct = d.total > 0 ? Math.round((d.count / d.total) * 100) : 0
   return (
-    <div style={{ background: 'white', border: '1px solid #E5E7EB', borderRadius: 8, padding: '8px 12px', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
-      <div style={{ fontWeight: 500, fontSize: 12, color: '#111827' }}>Score {d.range}</div>
-      <div style={{ fontSize: 11, color: '#6B7280', marginTop: 2 }}>{d.count.toLocaleString()} escalations · {pct}%</div>
+    <div style={{ background: 'white', border: '1px solid #EDE8FD', borderRadius: 8, padding: '8px 12px', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
+      <div style={{ fontWeight: 500, fontSize: 12, color: '#1A0A2B' }}>Score {d.range}</div>
+      <div style={{ fontSize: 11, color: '#6B5E8B', marginTop: 2 }}>{d.count.toLocaleString()} escalations · {pct}%</div>
     </div>
   )
 }
@@ -60,12 +60,12 @@ export default function ScoreDistChart({ data }: Props) {
   }
 
   return (
-    <div className="card-lift" style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', padding: 20 }}>
+    <div className="card-lift" style={{ background: 'white', borderRadius: 12, border: '1px solid #EDE8FD', padding: 20, boxShadow: '0 1px 4px rgba(115,8,227,0.06)' }}>
       <div className="flex justify-between items-center mb-3">
-        <span style={{ fontWeight: 500, fontSize: 12, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'Inter, sans-serif' }}>
+        <span style={{ fontWeight: 500, fontSize: 12, color: '#9E94BC', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'Inter, sans-serif' }}>
           Score distribution
         </span>
-        <span style={{ fontSize: 11, color: '#9CA3AF', fontFamily: 'Inter, sans-serif' }}>Open escalations</span>
+        <span style={{ fontSize: 11, color: '#9E94BC', fontFamily: 'Inter, sans-serif' }}>Open escalations</span>
       </div>
 
       {/* Legend */}
@@ -77,7 +77,7 @@ export default function ScoreDistChart({ data }: Props) {
         ].map(item => (
           <div key={item.label} className="flex items-center gap-1.5">
             <div style={{ width: 8, height: 8, backgroundColor: item.color, borderRadius: 2 }} />
-            <span style={{ fontSize: 11, color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
+            <span style={{ fontSize: 11, color: '#6B5E8B', fontFamily: 'Inter, sans-serif' }}>
               {item.label} · {item.count.toLocaleString()}
             </span>
           </div>
@@ -87,8 +87,8 @@ export default function ScoreDistChart({ data }: Props) {
       <ResponsiveContainer width="100%" height={180}>
         <BarChart data={chartData} margin={{ top: 4, right: 0, left: -20, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
-          <XAxis dataKey="range" tick={{ fontSize: 11, fill: '#6B7280' }} axisLine={false} tickLine={false} />
-          <YAxis tick={{ fontSize: 10, fill: '#6B7280' }} axisLine={false} tickLine={false} tickCount={4} />
+          <XAxis dataKey="range" tick={{ fontSize: 11, fill: '#6B5E8B' }} axisLine={false} tickLine={false} />
+          <YAxis tick={{ fontSize: 10, fill: '#6B5E8B' }} axisLine={false} tickLine={false} tickCount={4} />
           <Tooltip content={<CustomTooltip />} />
           <Bar dataKey="count" radius={[6, 6, 0, 0]} animationDuration={600} animationEasing="ease-out"
             onClick={(entry) => handleBarClick(entry as { min: number; max: number })}>

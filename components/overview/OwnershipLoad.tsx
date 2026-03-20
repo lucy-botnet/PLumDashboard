@@ -17,15 +17,15 @@ function LoadPips({ count, isUnassigned }: { count: number; isUnassigned: boolea
   const isHeavy = count > 40
   const pips = [
     isHeavy ? '#D97706' : '#059669',
-    isHeavy ? '#D97706' : '#E5E7EB',
-    '#E5E7EB',
+    isHeavy ? '#D97706' : '#EDE8FD',
+    '#EDE8FD',
   ]
   return (
     <div className="flex items-center gap-1">
       {pips.map((color, i) => (
         <div key={i} style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: color }} />
       ))}
-      <span style={{ fontSize: 12, fontWeight: 500, color: '#111827', marginLeft: 4, fontFamily: 'Inter, sans-serif' }}>
+      <span style={{ fontSize: 12, fontWeight: 500, color: '#1A0A2B', marginLeft: 4, fontFamily: 'Inter, sans-serif' }}>
         {count}
       </span>
     </div>
@@ -37,12 +37,12 @@ export default function OwnershipLoad({ owners }: Props) {
   const { setFilter, owner: activeOwner } = useAppStore()
 
   return (
-    <div className="card-lift" style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', padding: 20 }}>
+    <div className="card-lift" style={{ background: 'white', borderRadius: 12, border: '1px solid #EDE8FD', padding: 20, boxShadow: '0 1px 4px rgba(115,8,227,0.06)' }}>
       <div className="flex justify-between items-center mb-3">
-        <span style={{ fontWeight: 500, fontSize: 12, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'Inter, sans-serif' }}>
+        <span style={{ fontWeight: 500, fontSize: 12, color: '#9E94BC', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'Inter, sans-serif' }}>
           Ownership load
         </span>
-        <span style={{ fontSize: 11, color: '#9CA3AF', fontFamily: 'Inter, sans-serif' }}>high priority only</span>
+        <span style={{ fontSize: 11, color: '#9E94BC', fontFamily: 'Inter, sans-serif' }}>high priority only</span>
       </div>
 
       {owners.map((item, i) => {
@@ -56,7 +56,7 @@ export default function OwnershipLoad({ owners }: Props) {
             key={item.owner}
             className="flex items-center gap-2 cursor-pointer transition-colors py-2"
             style={{
-              borderBottom: i < owners.length - 1 ? '1px solid #E5E7EB' : 'none',
+              borderBottom: i < owners.length - 1 ? '1px solid #EDE8FD' : 'none',
               opacity: isActive ? 1 : 0.4,
             }}
             onClick={() => {
@@ -67,7 +67,7 @@ export default function OwnershipLoad({ owners }: Props) {
                 router.push('/dashboard/detail')
               }
             }}
-            onMouseEnter={e => ((e.currentTarget as HTMLElement).style.backgroundColor = '#F9FAFB')}
+            onMouseEnter={e => ((e.currentTarget as HTMLElement).style.backgroundColor = '#FDFCFF')}
             onMouseLeave={e => ((e.currentTarget as HTMLElement).style.backgroundColor = 'transparent')}
           >
             {/* Avatar */}
@@ -76,8 +76,8 @@ export default function OwnershipLoad({ owners }: Props) {
                 width: 28,
                 height: 28,
                 borderRadius: '50%',
-                backgroundColor: isUnassigned ? '#FCEBEB' : '#EEF2FF',
-                color: isUnassigned ? '#DC2626' : '#4F46E5',
+                backgroundColor: isUnassigned ? '#FCEBEB' : '#EDE8FD',
+                color: isUnassigned ? '#DC2626' : '#7308E3',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -93,7 +93,7 @@ export default function OwnershipLoad({ owners }: Props) {
             {/* Name + count */}
             <div style={{ flex: 1 }}>
               <div className="flex items-center">
-                <span style={{ fontWeight: 500, fontSize: 12, color: '#111827', fontFamily: 'Inter, sans-serif' }}>
+                <span style={{ fontWeight: 500, fontSize: 12, color: '#1A0A2B', fontFamily: 'Inter, sans-serif' }}>
                   {cleanName}
                 </span>
                 {isOOO && (
@@ -102,7 +102,7 @@ export default function OwnershipLoad({ owners }: Props) {
                   </span>
                 )}
               </div>
-              <div style={{ fontSize: 11, color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
+              <div style={{ fontSize: 11, color: '#6B5E8B', fontFamily: 'Inter, sans-serif' }}>
                 {item.count} open · {item.highCount} high
               </div>
             </div>
@@ -120,7 +120,7 @@ export default function OwnershipLoad({ owners }: Props) {
       })}
 
       {owners.length === 0 && (
-        <div style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 12, padding: '20px 0', fontFamily: 'Inter, sans-serif' }}>
+        <div style={{ textAlign: 'center', color: '#9E94BC', fontSize: 12, padding: '20px 0', fontFamily: 'Inter, sans-serif' }}>
           No ownership data
         </div>
       )}

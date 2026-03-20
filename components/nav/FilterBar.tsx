@@ -13,14 +13,14 @@ const FILTER_LABELS: Partial<Record<keyof FilterState, (v: unknown) => string>> 
   search: (v) => `"${v}"`,
 }
 
-const FILTER_COLORS: Partial<Record<keyof FilterState, string>> = {
-  priority: '#DC2626',
-  channel: '#4F46E5',
-  status: '#0C447C',
-  tier: '#633806',
-  owner: '#6B7280',
-  scoreRange: '#7C3AED',
-  search: '#111827',
+const FILTER_COLORS: Partial<Record<keyof FilterState, { text: string; bg: string; border: string }>> = {
+  priority: { text: '#E53030', bg: '#FDEAEA', border: '#FCA5A5' },
+  channel:  { text: '#7308E3', bg: '#EDE8FD', border: '#C4B5FD' },
+  status:   { text: '#1A0A2B', bg: '#F6F3FF', border: '#D9D0F8' },
+  tier:     { text: '#D97706', bg: '#FEF3C7', border: '#FCD34D' },
+  owner:    { text: '#6B5E8B', bg: '#F6F3FF', border: '#D9D0F8' },
+  scoreRange: { text: '#7308E3', bg: '#EDE8FD', border: '#C4B5FD' },
+  search:   { text: '#1A0A2B', bg: '#F6F3FF', border: '#D9D0F8' },
 }
 
 export default function FilterBar() {
@@ -29,42 +29,46 @@ export default function FilterBar() {
   const activeFilters = Object.entries(FILTER_LABELS)
     .filter(([key]) => {
       const val = store[key as keyof FilterState]
-      if (val === null || val === undefined || val === '') return false
-      return true
+      return val !== null && val !== undefined && val !== ''
     })
     .map(([key, labelFn]) => ({
       key: key as keyof FilterState,
       label: labelFn!(store[key as keyof FilterState]),
-      color: FILTER_COLORS[key as keyof FilterState] || '#6B7280',
+      colors: FILTER_COLORS[key as keyof FilterState] || { text: '#6B5E8B', bg: '#F6F3FF', border: '#D9D0F8' },
     }))
 
   if (activeFilters.length === 0) return null
 
   return (
     <div
-      className="w-full flex items-center gap-3 px-6 border-b"
       style={{
-        height: 44,
-        backgroundColor: '#F3F4F6',
-        borderBottomColor: '#E5E7EB',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        padding: '8px 20px',
+        backgroundColor: '#F6F3FF',
+        borderBottom: '1px solid #EDE8FD',
+        flexWrap: 'wrap',
       }}
     >
-      <span style={{ fontWeight: 400, fontSize: 12, color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
-        Filtered by:
+      <span style={{ fontWeight: 500, fontSize: 11, color: '#9E94BC', fontFamily: 'Inter, sans-serif', letterSpacing: '0.05em' }}>
+        FILTERED BY
       </span>
 
-      {activeFilters.map(({ key, label, color }) => (
+      {activeFilters.map(({ key, label, colors }) => (
         <div
           key={key}
-          className="flex items-center gap-1"
           style={{
-            background: 'white',
-            border: '1px solid #E5E7EB',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
+            background: colors.bg,
+            border: `1px solid ${colors.border}`,
             borderRadius: 20,
-            padding: '2px 10px',
+            padding: '3px 10px 3px 10px',
           }}
         >
-          <span style={{ fontWeight: 500, fontSize: 12, color, fontFamily: 'Inter, sans-serif' }}>
+          <span style={{ fontWeight: 600, fontSize: 11, color: colors.text, fontFamily: 'Inter, sans-serif' }}>
             {label}
           </span>
           <button
@@ -73,11 +77,15 @@ export default function FilterBar() {
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              color: '#9CA3AF',
+              color: colors.text,
               fontSize: 14,
               lineHeight: 1,
               padding: '0 0 0 4px',
+              opacity: 0.6,
+              transition: 'opacity 120ms',
             }}
+            onMouseEnter={e => ((e.currentTarget as HTMLElement).style.opacity = '1')}
+            onMouseLeave={e => ((e.currentTarget as HTMLElement).style.opacity = '0.6')}
           >
             ×
           </button>
@@ -92,16 +100,18 @@ export default function FilterBar() {
           background: 'none',
           border: 'none',
           cursor: 'pointer',
-          fontWeight: 400,
-          fontSize: 12,
-          color: '#4F46E5',
+          fontWeight: 600,
+          fontSize: 11,
+          color: '#7308E3',
           fontFamily: 'Inter, sans-serif',
-          textDecoration: 'none',
+          letterSpacing: '0.02em',
+          padding: '0',
+          transition: 'opacity 120ms',
         }}
-        onMouseEnter={e => ((e.currentTarget as HTMLElement).style.textDecoration = 'underline')}
-        onMouseLeave={e => ((e.currentTarget as HTMLElement).style.textDecoration = 'none')}
+        onMouseEnter={e => ((e.currentTarget as HTMLElement).style.opacity = '0.7')}
+        onMouseLeave={e => ((e.currentTarget as HTMLElement).style.opacity = '1')}
       >
-        Clear all
+        Clear all ×
       </button>
     </div>
   )

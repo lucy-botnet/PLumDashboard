@@ -1,49 +1,103 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ── Plum Design Tokens ── */
+:root {
+  --plum-primary:       #7308E3;
+  --plum-primary-dark:  #5A06B5;
+  --plum-primary-deep:  #3D0488;
+  --plum-primary-light: #EDE8FD;
+  --plum-primary-xlight:#F6F3FF;
+  --plum-dark:          #1A0A2B;
+  --plum-dark-2:        #251540;
+  --plum-dark-3:        #3B2260;
+  --plum-surface:       #FFFFFF;
+  --plum-bg:            #F6F3FF;
+  --plum-border:        #EDE8FD;
+  --plum-border-2:      #D9D0F8;
+  --plum-text:          #1A0A2B;
+  --plum-text-2:        #6B5E8B;
+  --plum-text-3:        #9E94BC;
+  --plum-red:           #E53030;
+  --plum-amber:         #D97706;
+  --plum-green:         #059669;
+  --plum-shadow-sm:     0 1px 4px rgba(115, 8, 227, 0.06);
+  --plum-shadow-md:     0 4px 16px rgba(115, 8, 227, 0.10);
+  --plum-shadow-lg:     0 8px 32px rgba(115, 8, 227, 0.15);
+}
+
 * {
   box-sizing: border-box;
 }
 
-html,
-body {
+html, body {
   margin: 0;
   padding: 0;
   font-family: 'Inter', sans-serif;
-  background-color: #F9FAFB;
-  color: #111827;
+  background-color: var(--plum-bg);
+  color: var(--plum-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
-/* ── Interactive card hover lift ── */
+/* ── Plum card hover lift ── */
 .card-lift {
   transition: box-shadow 200ms ease, transform 200ms ease, border-color 200ms ease;
 }
 .card-lift:hover {
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08) !important;
+  box-shadow: var(--plum-shadow-md) !important;
   transform: translateY(-2px);
+  border-color: var(--plum-border-2) !important;
+}
+
+/* ── Plum card base ── */
+.plum-card {
+  background: var(--plum-surface);
+  border: 1px solid var(--plum-border);
+  border-radius: 12px;
+  box-shadow: var(--plum-shadow-sm);
 }
 
 /* ── Button smooth fill ── */
-.btn-outline-indigo {
-  transition: background-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
+.btn-plum {
+  background: var(--plum-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: background 150ms ease, box-shadow 150ms ease, transform 150ms ease;
 }
-.btn-outline-indigo:hover {
-  background-color: #4F46E5 !important;
-  color: white !important;
+.btn-plum:hover {
+  background: var(--plum-primary-dark);
+  box-shadow: 0 4px 12px rgba(115, 8, 227, 0.35);
+  transform: translateY(-1px);
 }
 
-/* ── Fade-in entrance animation ── */
+.btn-outline-plum {
+  background: transparent;
+  color: var(--plum-primary);
+  border: 1.5px solid var(--plum-primary);
+  border-radius: 8px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+.btn-outline-plum:hover {
+  background: var(--plum-primary);
+  color: white;
+}
+
+/* ── Fade-in animation ── */
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -54,25 +108,20 @@ body {
 
 /* ── Pulse badge for high priority ── */
 @keyframes pulse-red {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.35); }
-  50%       { box-shadow: 0 0 0 4px rgba(220, 38, 38, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(229, 48, 48, 0.35); }
+  50%       { box-shadow: 0 0 0 4px rgba(229, 48, 48, 0); }
 }
 .pulse-badge {
   animation: pulse-red 2s ease-in-out infinite;
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #F9FAFB;
-}
-::-webkit-scrollbar-thumb {
-  background: #E5E7EB;
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #D1D5DB;
-}
+/* ── Plum sidebar dark scrollbar ── */
+.plum-sidebar ::-webkit-scrollbar { width: 4px; }
+.plum-sidebar ::-webkit-scrollbar-track { background: transparent; }
+.plum-sidebar ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+/* ── Scrollbar styling ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--plum-bg); }
+::-webkit-scrollbar-thumb { background: var(--plum-border-2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--plum-text-3); }

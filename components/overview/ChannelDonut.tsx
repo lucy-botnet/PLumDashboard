@@ -11,7 +11,7 @@ interface Props {
 
 const CHANNELS = [
   { key: 'WhatsApp', color: '#059669' },
-  { key: 'Slack', color: '#4F46E5' },
+  { key: 'Slack', color: '#7308E3' },
   { key: 'Email', color: '#7C3AED' },
 ]
 
@@ -20,9 +20,9 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
   const d = payload[0]
   const pct = d.payload.total > 0 ? Math.round((d.value / d.payload.total) * 100) : 0
   return (
-    <div style={{ background: 'white', border: '1px solid #E5E7EB', borderRadius: 8, padding: '8px 12px', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
-      <div style={{ fontWeight: 500, fontSize: 12, color: '#111827' }}>{d.name}</div>
-      <div style={{ fontSize: 11, color: '#6B7280', marginTop: 2 }}>{d.value.toLocaleString()} · {pct}%</div>
+    <div style={{ background: 'white', border: '1px solid #EDE8FD', borderRadius: 8, padding: '8px 12px', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
+      <div style={{ fontWeight: 500, fontSize: 12, color: '#1A0A2B' }}>{d.name}</div>
+      <div style={{ fontSize: 11, color: '#6B5E8B', marginTop: 2 }}>{d.value.toLocaleString()} · {pct}%</div>
     </div>
   )
 }
@@ -49,9 +49,9 @@ export default function ChannelDonut({ data }: Props) {
   }
 
   return (
-    <div className="card-lift" style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', padding: 20 }}>
+    <div className="card-lift" style={{ background: 'white', borderRadius: 12, border: '1px solid #EDE8FD', padding: 20, boxShadow: '0 1px 4px rgba(115,8,227,0.06)' }}>
       <div className="mb-2">
-        <span style={{ fontWeight: 500, fontSize: 12, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'Inter, sans-serif' }}>
+        <span style={{ fontWeight: 500, fontSize: 12, color: '#9E94BC', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'Inter, sans-serif' }}>
           By channel
         </span>
       </div>
@@ -85,10 +85,10 @@ export default function ChannelDonut({ data }: Props) {
         <div
           className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none"
         >
-          <div style={{ fontWeight: 600, fontSize: 20, color: '#111827', fontFamily: 'Inter, sans-serif' }}>
+          <div style={{ fontWeight: 600, fontSize: 20, color: '#1A0A2B', fontFamily: 'Inter, sans-serif' }}>
             {total.toLocaleString()}
           </div>
-          <div style={{ fontSize: 11, color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>total</div>
+          <div style={{ fontSize: 11, color: '#6B5E8B', fontFamily: 'Inter, sans-serif' }}>total</div>
         </div>
       </div>
 
@@ -99,7 +99,7 @@ export default function ChannelDonut({ data }: Props) {
           return (
             <div key={item.name} className="flex items-center gap-1">
               <div style={{ width: 8, height: 8, backgroundColor: item.color, borderRadius: 2 }} />
-              <span style={{ fontSize: 11, color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
+              <span style={{ fontSize: 11, color: '#6B5E8B', fontFamily: 'Inter, sans-serif' }}>
                 {item.name} · {item.value.toLocaleString()} · {pct}%
               </span>
             </div>

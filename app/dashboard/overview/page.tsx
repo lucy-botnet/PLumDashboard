@@ -82,7 +82,7 @@ function RecentEscalationTable({
 
   if (rows.length === 0) {
     return (
-      <div style={{ textAlign: 'center', padding: '20px 0', color: '#9CA3AF', fontSize: 12, fontFamily: 'Inter, sans-serif' }}>
+      <div style={{ textAlign: 'center', padding: '20px 0', color: '#9E94BC', fontSize: 12, fontFamily: 'Inter, sans-serif' }}>
         {emptyLabel}
       </div>
     )
@@ -103,7 +103,7 @@ function RecentEscalationTable({
         {['Account', 'Priority', 'Channel', 'Score', 'Age', 'Status'].map(h => (
           <span
             key={h}
-            style={{ fontSize: 10, fontWeight: 600, color: '#9CA3AF', fontFamily: 'Inter, sans-serif', textTransform: 'uppercase', letterSpacing: '0.06em' }}
+            style={{ fontSize: 10, fontWeight: 600, color: '#9E94BC', fontFamily: 'Inter, sans-serif', textTransform: 'uppercase', letterSpacing: '0.06em' }}
           >
             {h}
           </span>
@@ -122,18 +122,18 @@ function RecentEscalationTable({
               gridTemplateColumns: '1fr 90px 80px 60px 60px 80px',
               gap: 8,
               padding: '8px 14px',
-              borderBottom: '1px solid #F9FAFB',
+              borderBottom: '1px solid #F6F3FF',
               cursor: 'pointer',
               transition: 'background 120ms',
             }}
-            onMouseEnter={e => ((e.currentTarget as HTMLElement).style.backgroundColor = '#F9FAFB')}
+            onMouseEnter={e => ((e.currentTarget as HTMLElement).style.backgroundColor = '#FDFCFF')}
             onMouseLeave={e => ((e.currentTarget as HTMLElement).style.backgroundColor = 'transparent')}
           >
             <span
               style={{
                 fontWeight: 500,
                 fontSize: 12,
-                color: '#111827',
+                color: '#1A0A2B',
                 fontFamily: 'Inter, sans-serif',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -163,11 +163,11 @@ function RecentEscalationTable({
                   width: 6,
                   height: 6,
                   borderRadius: '50%',
-                  backgroundColor: CHANNEL_COLORS[esc.channel] || '#6B7280',
+                  backgroundColor: CHANNEL_COLORS[esc.channel] || '#6B5E8B',
                   flexShrink: 0,
                 }}
               />
-              <span style={{ fontSize: 11, color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>{esc.channel}</span>
+              <span style={{ fontSize: 11, color: '#6B5E8B', fontFamily: 'Inter, sans-serif' }}>{esc.channel}</span>
             </div>
             <span
               style={{
@@ -182,7 +182,7 @@ function RecentEscalationTable({
             <span
               style={{
                 fontSize: 11,
-                color: ageDays > 2 ? '#DC2626' : '#6B7280',
+                color: ageDays > 2 ? '#DC2626' : '#6B5E8B',
                 fontFamily: 'Inter, sans-serif',
                 fontWeight: ageDays > 2 ? 600 : 400,
               }}
@@ -231,7 +231,7 @@ function RecentSection({
       style={{
         backgroundColor: 'white',
         borderRadius: 12,
-        border: '1px solid #E5E7EB',
+        border: '1px solid #EDE8FD',
         overflow: 'hidden',
       }}
     >
@@ -250,7 +250,7 @@ function RecentSection({
               style={{
                 fontWeight: 600,
                 fontSize: 13,
-                color: '#111827',
+                color: '#1A0A2B',
                 fontFamily: 'Inter, sans-serif',
               }}
             >
@@ -270,7 +270,7 @@ function RecentSection({
               {badge}
             </span>
           </div>
-          <div style={{ fontSize: 11, color: '#9CA3AF', fontFamily: 'Inter, sans-serif', marginTop: 2 }}>
+          <div style={{ fontSize: 11, color: '#9E94BC', fontFamily: 'Inter, sans-serif', marginTop: 2 }}>
             {subtitle}
           </div>
         </div>
@@ -342,7 +342,7 @@ export default function OverviewPage() {
   const displayStats = stats || FALLBACK_STATS
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#F9FAFB' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#F6F3FF' }}>
       <TopNav />
 
       {/* Content shifted right of sidebar */}
@@ -350,7 +350,7 @@ export default function OverviewPage() {
         <FilterBar />
 
         {error && (
-          <div style={{ backgroundColor: '#FCEBEB', color: '#DC2626', fontSize: 12, padding: '8px 20px', borderBottom: '1px solid #F09595', fontFamily: 'Inter, sans-serif' }}>
+          <div style={{ backgroundColor: '#FDEAEA', color: '#E53030', fontSize: 12, padding: '8px 20px', borderBottom: '1px solid #FCA5A5', fontFamily: 'Inter, sans-serif' }}>
             ⚠ {error}
           </div>
         )}
@@ -363,11 +363,11 @@ export default function OverviewPage() {
             gap: 6,
             padding: '10px 20px',
             backgroundColor: 'white',
-            borderBottom: '1px solid #E5E7EB',
+            borderBottom: '1px solid #EDE8FD',
           }}
         >
-          <span style={{ fontSize: 11, color: '#6B7280', fontFamily: 'Inter, sans-serif', fontWeight: 500, marginRight: 4 }}>
-            Time range:
+          <span style={{ fontSize: 11, color: '#9E94BC', fontFamily: 'Inter, sans-serif', fontWeight: 600, marginRight: 4, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            Time range
           </span>
           {PRESETS.map(p => (
             <button
@@ -375,11 +375,11 @@ export default function OverviewPage() {
               onClick={() => handlePreset(p.value)}
               style={{
                 fontSize: 11,
-                fontWeight: datePreset === p.value ? 600 : 400,
+                fontWeight: datePreset === p.value ? 700 : 400,
                 fontFamily: 'Inter, sans-serif',
-                color: datePreset === p.value ? '#4F46E5' : '#6B7280',
-                backgroundColor: datePreset === p.value ? '#EEF2FF' : 'transparent',
-                border: datePreset === p.value ? '1px solid #C7D2FE' : '1px solid #E5E7EB',
+                color: datePreset === p.value ? '#7308E3' : '#6B5E8B',
+                backgroundColor: datePreset === p.value ? '#EDE8FD' : 'transparent',
+                border: datePreset === p.value ? '1.5px solid #C4B5FD' : '1px solid #EDE8FD',
                 borderRadius: 20,
                 padding: '4px 12px',
                 cursor: 'pointer',
@@ -398,14 +398,14 @@ export default function OverviewPage() {
                 style={{
                   fontSize: 11,
                   fontFamily: 'Inter, sans-serif',
-                  border: '1px solid #E5E7EB',
+                  border: '1px solid #EDE8FD',
                   borderRadius: 6,
                   padding: '4px 8px',
-                  color: '#374151',
+                  color: '#1A0A2B',
                   outline: 'none',
                 }}
               />
-              <span style={{ fontSize: 11, color: '#9CA3AF' }}>to</span>
+              <span style={{ fontSize: 11, color: '#9E94BC' }}>to</span>
               <input
                 type="date"
                 value={customTo}
@@ -413,10 +413,10 @@ export default function OverviewPage() {
                 style={{
                   fontSize: 11,
                   fontFamily: 'Inter, sans-serif',
-                  border: '1px solid #E5E7EB',
+                  border: '1px solid #EDE8FD',
                   borderRadius: 6,
                   padding: '4px 8px',
-                  color: '#374151',
+                  color: '#1A0A2B',
                   outline: 'none',
                 }}
               />
@@ -428,7 +428,7 @@ export default function OverviewPage() {
                   fontWeight: 600,
                   fontFamily: 'Inter, sans-serif',
                   color: 'white',
-                  backgroundColor: customFrom ? '#4F46E5' : '#C7D2FE',
+                  backgroundColor: customFrom ? '#7308E3' : '#D9D0F8',
                   border: 'none',
                   borderRadius: 6,
                   padding: '5px 12px',
@@ -445,11 +445,12 @@ export default function OverviewPage() {
               onClick={() => handlePreset('all')}
               style={{
                 fontSize: 11,
-                color: '#6B7280',
+                color: '#7308E3',
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
                 fontFamily: 'Inter, sans-serif',
+                fontWeight: 500,
                 textDecoration: 'underline',
               }}
             >
@@ -461,9 +462,9 @@ export default function OverviewPage() {
         <main style={{ padding: '16px 20px 24px' }}>
           {/* KPI Strip */}
           {loading ? (
-            <div className="w-full bg-white border-b grid grid-cols-4" style={{ borderBottomColor: '#E5E7EB', borderRadius: 12, overflow: 'hidden' }}>
+            <div className="w-full bg-white border-b grid grid-cols-4" style={{ borderBottomColor: '#EDE8FD', borderRadius: 12, overflow: 'hidden' }}>
               {[1, 2, 3, 4].map(i => (
-                <div key={i} style={{ borderRight: i < 4 ? '1px solid #E5E7EB' : 'none' }}>
+                <div key={i} style={{ borderRight: i < 4 ? '1px solid #EDE8FD' : 'none' }}>
                   <SkeletonKpi />
                 </div>
               ))}
@@ -500,13 +501,13 @@ export default function OverviewPage() {
                 style={{
                   fontWeight: 600,
                   fontSize: 14,
-                  color: '#111827',
+                  color: '#1A0A2B',
                   fontFamily: 'Inter, sans-serif',
                 }}
               >
                 Recent Escalations
               </span>
-              <div style={{ flex: 1, height: 1, backgroundColor: '#E5E7EB' }} />
+              <div style={{ flex: 1, height: 1, backgroundColor: '#EDE8FD' }} />
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }}>

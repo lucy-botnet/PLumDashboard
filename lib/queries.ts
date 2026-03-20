@@ -3,8 +3,28 @@ import type { EscalationRow, FilterState, GroupedAccount, Stats } from '@/types'
 
 const PAGE_SIZE = 20
 
-export async function fetchStats(): Promise<Stats> {
-  // Fetch all non-closed escalations for stats
+export async function fetchStats(since?: string): Promise<Stats> {
+  // Build base queries with optional date filter
+  let q0 = supabase.from('escalations').select('priority_bucket, age_hours, sla_hours, score, dim_business, dim_time_age, dim_comms, dim_complexity, dim_risk, dim_ownership, dim_historical').neq('current_status', 'Closed')
+  let q1 = supabase.from('escalations').select('channel, score').neq('current_status', 'Closed')
+  let q2 = supabase.from('escalations').select('account_tier, score').neq('current_status', 'Closed')
+  let q3 = supabase.from('escalations').select('current_status').neq('current_status', 'Closed')
+  let q4 = supabase.from('escalations').select('score').neq('current_status', 'Closed')
+  let q5 = supabase.from('escalations').select('*').neq('current_status', 'Closed').order('age_hours', { ascending: false }).limit(5)
+  let q6 = supabase.from('escalations').select('owner, priority_bucket').neq('current_status', 'Closed')
+  let q7 = supabase.from('escalations').select('channel, account_tier, sla_hours, age_hours').neq('current_status', 'Closed')
+
+  if (since) {
+    q0 = q0.gte('created_at', since)
+    q1 = q1.gte('created_at', since)
+    q2 = q2.gte('created_at', since)
+    q3 = q3.gte('created_at', since)
+    q4 = q4.gte('created_at', since)
+    q5 = q5.gte('created_at', since)
+    q6 = q6.gte('created_at', since)
+    q7 = q7.gte('created_at', since)
+  }
+
   const [
     openRes,
     channelRes,
@@ -14,42 +34,7 @@ export async function fetchStats(): Promise<Stats> {
     oldestRes,
     ownerRes,
     allScoresRes,
-  ] = await Promise.all([
-    supabase
-      .from('escalations')
-      .select('priority_bucket, age_hours, sla_hours, score, dim_business, dim_time_age, dim_comms, dim_complexity, dim_risk, dim_ownership, dim_historical')
-      .neq('current_status', 'Closed'),
-    supabase
-      .from('escalations')
-      .select('channel, score')
-      .neq('current_status', 'Closed'),
-    supabase
-      .from('escalations')
-      .select('account_tier, score')
-      .neq('current_status', 'Closed'),
-    supabase
-      .from('escalations')
-      .select('current_status')
-      .neq('current_status', 'Closed'),
-    supabase
-      .from('escalations')
-      .select('score')
-      .neq('current_status', 'Closed'),
-    supabase
-      .from('escalations')
-      .select('*')
-      .neq('current_status', 'Closed')
-      .order('age_hours', { ascending: false })
-      .limit(5),
-    supabase
-      .from('escalations')
-      .select('owner, priority_bucket')
-      .neq('current_status', 'Closed'),
-    supabase
-      .from('escalations')
-      .select('channel, account_tier, sla_hours, age_hours')
-      .neq('current_status', 'Closed'),
-  ])
+  ] = await Promise.all([q0, q1, q2, q3, q4, q5, q6, q7])
 
   const openRows = openRes.data || []
   const channelRows = channelRes.data || []
@@ -258,4 +243,46 @@ export async function fetchOwners(): Promise<string[]> {
 
   const owners = Array.from(new Set((data || []).map(r => r.owner))).filter(Boolean).sort() as string[]
   return owners
+}
+
+export async function fetchRecentEscalations(): Promise<{
+  today: EscalationRow[]
+  thisWeek: EscalationRow[]
+  thisMonth: EscalationRow[]
+}> {
+  const now = new Date()
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString()
+  const day = now.getDay()
+  const weekDiff = now.getDate() - day + (day === 0 ? -6 : 1)
+  const weekStart = new Date(now.getFullYear(), now.getMonth(), weekDiff).toISOString()
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
+
+  const [todayRes, weekRes, monthRes] = await Promise.all([
+    supabase
+      .from('escalations')
+      .select('*')
+      .gte('created_at', todayStart)
+      .order('score', { ascending: false })
+      .limit(10),
+    supabase
+      .from('escalations')
+      .select('*')
+      .gte('created_at', weekStart)
+      .lt('created_at', todayStart)
+      .order('score', { ascending: false })
+      .limit(10),
+    supabase
+      .from('escalations')
+      .select('*')
+      .gte('created_at', monthStart)
+      .lt('created_at', weekStart)
+      .order('score', { ascending: false })
+      .limit(10),
+  ])
+
+  return {
+    today: (todayRes.data || []) as EscalationRow[],
+    thisWeek: (weekRes.data || []) as EscalationRow[],
+    thisMonth: (monthRes.data || []) as EscalationRow[],
+  }
 }

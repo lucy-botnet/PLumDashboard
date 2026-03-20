@@ -3,6 +3,7 @@
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell, ResponsiveContainer
 } from 'recharts'
+import { useRouter } from 'next/navigation'
 import { useAppStore } from '@/lib/store'
 import type { Stats } from '@/types'
 
@@ -31,6 +32,7 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
 }
 
 export default function AvgScoreChart({ data }: Props) {
+  const router = useRouter()
   const { setFilter, tier: activeTier, channel: activeChannel } = useAppStore()
 
   const chartData = SEGMENTS.map(s => ({
@@ -46,6 +48,7 @@ export default function AvgScoreChart({ data }: Props) {
       setFilter(entry.filterKey, null)
     } else {
       setFilter(entry.filterKey, entry.name)
+      router.push('/dashboard/detail')
     }
   }
 

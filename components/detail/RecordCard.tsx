@@ -54,58 +54,87 @@ function EscalationRow({ esc, onDraft }: { esc: EscalationRow; onDraft: (e: Esca
   const cColors = CHANNEL_COLORS[esc.channel] || CHANNEL_COLORS.Email
   const ageDays = Math.round((esc.age_hours || 0) / 24)
 
+  // Build message summary: prefer ai_summary, fall back to message text (truncated)
+  const summary = esc.ai_summary
+    ? esc.ai_summary
+    : esc.message
+    ? esc.message.replace(/\s+/g, ' ').trim()
+    : null
+  const summaryPreview = summary ? (summary.length > 130 ? summary.slice(0, 130) + '…' : summary) : null
+
   return (
     <div
-      className="flex items-center gap-3 px-5 py-2 border-b transition-colors last:border-b-0"
+      className="border-b last:border-b-0 transition-colors"
       style={{ borderBottomColor: '#E5E7EB' }}
       onMouseEnter={e => ((e.currentTarget as HTMLElement).style.backgroundColor = 'white')}
       onMouseLeave={e => ((e.currentTarget as HTMLElement).style.backgroundColor = 'transparent')}
     >
-      <span style={{ fontWeight: 500, fontSize: 11, color: '#9CA3AF', width: 80, flexShrink: 0, fontFamily: 'Inter, sans-serif' }}>
-        {esc.escalation_id}
-      </span>
-      <div style={{ flex: 1 }}>
-        <div style={{ fontWeight: 400, fontSize: 12, color: '#111827', fontFamily: 'Inter, sans-serif', textTransform: 'capitalize' }}>
-          {esc.priority_hint || 'general'}
+      {/* Top row: ID / pills / score / draft */}
+      <div className="flex items-center gap-3 px-5 pt-2.5 pb-1">
+        <span style={{ fontWeight: 500, fontSize: 11, color: '#9CA3AF', width: 80, flexShrink: 0, fontFamily: 'Inter, sans-serif' }}>
+          {esc.escalation_id}
+        </span>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontWeight: 500, fontSize: 12, color: '#111827', fontFamily: 'Inter, sans-serif', textTransform: 'capitalize' }}>
+            {esc.subject || esc.priority_hint || 'general'}
+          </div>
+          <div className="flex gap-1 mt-0.5">
+            <Pill label={esc.channel} colors={cColors} />
+            <Pill label={esc.current_status} colors={sColors} />
+          </div>
         </div>
-        <div className="flex gap-1 mt-0.5">
-          <Pill label={esc.channel} colors={cColors} />
-          <Pill label={esc.current_status} colors={sColors} />
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <span style={{ fontWeight: 600, fontSize: 12, color: pColors.text, fontFamily: 'Inter, sans-serif' }}>
+            {esc.score}
+          </span>
+          <span style={{ fontWeight: 400, fontSize: 11, color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
+            {ageDays}d
+          </span>
+          <button
+            onClick={e => { e.stopPropagation(); onDraft(esc) }}
+            style={{
+              fontWeight: 500,
+              fontSize: 11,
+              padding: '4px 10px',
+              border: '1px solid #4F46E5',
+              color: '#4F46E5',
+              borderRadius: 6,
+              backgroundColor: 'transparent',
+              cursor: 'pointer',
+              fontFamily: 'Inter, sans-serif',
+              transition: 'all 150ms',
+            }}
+            onMouseEnter={e => {
+              ;(e.currentTarget as HTMLButtonElement).style.backgroundColor = '#4F46E5'
+              ;(e.currentTarget as HTMLButtonElement).style.color = 'white'
+            }}
+            onMouseLeave={e => {
+              ;(e.currentTarget as HTMLButtonElement).style.backgroundColor = 'transparent'
+              ;(e.currentTarget as HTMLButtonElement).style.color = '#4F46E5'
+            }}
+          >
+            Draft
+          </button>
         </div>
       </div>
-      <div className="flex items-center gap-2 flex-shrink-0">
-        <span style={{ fontWeight: 600, fontSize: 12, color: pColors.text, fontFamily: 'Inter, sans-serif' }}>
-          {esc.score}
-        </span>
-        <span style={{ fontWeight: 400, fontSize: 11, color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
-          {ageDays}d
-        </span>
-        <button
-          onClick={e => { e.stopPropagation(); onDraft(esc) }}
+      {/* Message summary */}
+      {summaryPreview && (
+        <div
           style={{
-            fontWeight: 500,
-            fontSize: 11,
-            padding: '4px 10px',
-            border: '1px solid #4F46E5',
-            color: '#4F46E5',
+            marginLeft: 100,
+            marginRight: 16,
+            marginBottom: 8,
+            padding: '6px 10px',
+            backgroundColor: '#F9FAFB',
             borderRadius: 6,
-            backgroundColor: 'transparent',
-            cursor: 'pointer',
-            fontFamily: 'Inter, sans-serif',
-            transition: 'all 150ms',
-          }}
-          onMouseEnter={e => {
-            ;(e.currentTarget as HTMLButtonElement).style.backgroundColor = '#4F46E5'
-            ;(e.currentTarget as HTMLButtonElement).style.color = 'white'
-          }}
-          onMouseLeave={e => {
-            ;(e.currentTarget as HTMLButtonElement).style.backgroundColor = 'transparent'
-            ;(e.currentTarget as HTMLButtonElement).style.color = '#4F46E5'
+            borderLeft: '2px solid #E5E7EB',
           }}
         >
-          Draft
-        </button>
-      </div>
+          <span style={{ fontSize: 11, fontWeight: 400, color: '#6B7280', fontFamily: 'Inter, sans-serif', lineHeight: 1.55 }}>
+            {summaryPreview}
+          </span>
+        </div>
+      )}
     </div>
   )
 }

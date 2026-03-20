@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
-import TopNav from '@/components/nav/TopNav'
+import TopNav, { SIDEBAR_WIDTH } from '@/components/nav/TopNav'
 import FilterBar from '@/components/nav/FilterBar'
 import FilterStrip from '@/components/detail/FilterStrip'
 import RecordCard from '@/components/detail/RecordCard'
@@ -96,6 +96,7 @@ export default function DetailPageContent() {
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#F9FAFB' }}>
       <TopNav />
+      <div style={{ marginLeft: SIDEBAR_WIDTH, minHeight: '100vh' }}>
       <FilterBar />
       <FilterStrip
         totalAccounts={totalCount}
@@ -130,6 +131,7 @@ export default function DetailPageContent() {
         isOpen={!!draftTarget}
         onClose={() => setDraftTarget(null)}
       />
+      </div>
     </div>
   )
 }

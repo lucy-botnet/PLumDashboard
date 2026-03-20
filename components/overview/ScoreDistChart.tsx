@@ -3,6 +3,7 @@
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell, ResponsiveContainer
 } from 'recharts'
+import { useRouter } from 'next/navigation'
 import { useAppStore } from '@/lib/store'
 import type { Stats } from '@/types'
 
@@ -32,6 +33,7 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
 }
 
 export default function ScoreDistChart({ data }: Props) {
+  const router = useRouter()
   const { setFilter, scoreRange } = useAppStore()
   const total = Object.values(data).reduce((a, b) => a + b, 0)
 
@@ -53,6 +55,7 @@ export default function ScoreDistChart({ data }: Props) {
       setFilter('scoreRange', null)
     } else {
       setFilter('scoreRange', [entry.min, entry.max])
+      router.push('/dashboard/detail')
     }
   }
 

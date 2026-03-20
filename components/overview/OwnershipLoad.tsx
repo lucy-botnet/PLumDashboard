@@ -1,5 +1,6 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { useAppStore } from '@/lib/store'
 import type { Stats } from '@/types'
 
@@ -32,6 +33,7 @@ function LoadPips({ count, isUnassigned }: { count: number; isUnassigned: boolea
 }
 
 export default function OwnershipLoad({ owners }: Props) {
+  const router = useRouter()
   const { setFilter, owner: activeOwner } = useAppStore()
 
   return (
@@ -58,8 +60,12 @@ export default function OwnershipLoad({ owners }: Props) {
               opacity: isActive ? 1 : 0.4,
             }}
             onClick={() => {
-              if (activeOwner === item.owner) setFilter('owner', null)
-              else setFilter('owner', item.owner)
+              if (activeOwner === item.owner) {
+                setFilter('owner', null)
+              } else {
+                setFilter('owner', item.owner)
+                router.push('/dashboard/detail')
+              }
             }}
             onMouseEnter={e => ((e.currentTarget as HTMLElement).style.backgroundColor = '#F9FAFB')}
             onMouseLeave={e => ((e.currentTarget as HTMLElement).style.backgroundColor = 'transparent')}

@@ -130,14 +130,15 @@ export default function RecordCard({ account, isExpanded, onToggle, onDraft }: P
 
   return (
     <div
+      className={isExpanded ? '' : 'card-lift'}
       style={{
         backgroundColor: 'white',
         borderRadius: isBlocked && isHighPriority ? '0 12px 12px 0' : 12,
         border: isExpanded ? '1px solid #4F46E5' : '1px solid #E5E7EB',
         borderLeft: isBlocked && isHighPriority ? '3px solid #DC2626' : (isExpanded ? '1px solid #4F46E5' : '1px solid #E5E7EB'),
         overflow: 'hidden',
-        transition: 'border-color 150ms',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+        transition: 'border-color 150ms, box-shadow 200ms',
+        boxShadow: isExpanded ? '0 0 0 2px rgba(79,70,229,0.12)' : '0 1px 3px rgba(0,0,0,0.08)',
       }}
     >
       {/* Main card section */}
@@ -209,6 +210,7 @@ export default function RecordCard({ account, isExpanded, onToggle, onDraft }: P
               {account.topScore}
             </span>
             <span
+              className={isHighPriority ? 'pulse-badge' : ''}
               style={{
                 fontSize: 11,
                 fontWeight: 500,

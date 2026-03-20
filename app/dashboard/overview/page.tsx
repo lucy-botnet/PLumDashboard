@@ -11,7 +11,6 @@ import SlaBreachBars from '@/components/overview/SlaBreachBars'
 import AgedCases from '@/components/overview/AgedCases'
 import OwnershipLoad from '@/components/overview/OwnershipLoad'
 import AvgScoreChart from '@/components/overview/AvgScoreChart'
-import DimensionAverages from '@/components/overview/DimensionAverages'
 import { SkeletonKpi } from '@/components/ui/Skeleton'
 import { fetchStats } from '@/lib/queries'
 import type { Stats } from '@/types'
@@ -106,9 +105,8 @@ export default function OverviewPage() {
         </div>
 
         {/* Full-width bottom row */}
-        <div className="grid grid-cols-2 gap-4 mt-4 mb-6">
+        <div className="mt-4 mb-6">
           <AvgScoreChart data={displayStats.avgScoreBySegment} />
-          <DimensionAverages data={displayStats.dimAverages} />
         </div>
       </main>
     </div>

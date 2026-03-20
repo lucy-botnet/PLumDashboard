@@ -35,7 +35,7 @@ export default function OwnershipLoad({ owners }: Props) {
   const { setFilter, owner: activeOwner } = useAppStore()
 
   return (
-    <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', padding: 20 }}>
+    <div className="card-lift" style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', padding: 20 }}>
       <div className="flex justify-between items-center mb-3">
         <span style={{ fontWeight: 500, fontSize: 12, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'Inter, sans-serif' }}>
           Ownership load

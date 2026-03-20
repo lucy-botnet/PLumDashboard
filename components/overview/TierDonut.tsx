@@ -1,6 +1,7 @@
 'use client'
 
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
+import { useRouter } from 'next/navigation'
 import { useAppStore } from '@/lib/store'
 import type { Stats } from '@/types'
 
@@ -28,6 +29,7 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
 
 export default function TierDonut({ data }: Props) {
   const { setFilter, tier: activeTier } = useAppStore()
+  const router = useRouter()
   const total = (data.Enterprise || 0) + (data['Mid-Market'] || 0) + (data.SMB || 0)
 
   const chartData = TIERS.map(t => ({
@@ -42,11 +44,12 @@ export default function TierDonut({ data }: Props) {
       setFilter('tier', null)
     } else {
       setFilter('tier', entry.name)
+      router.push('/dashboard/detail')
     }
   }
 
   return (
-    <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', padding: 20 }}>
+    <div className="card-lift" style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', padding: 20 }}>
       <div className="mb-2">
         <span style={{ fontWeight: 500, fontSize: 12, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'Inter, sans-serif' }}>
           By tier

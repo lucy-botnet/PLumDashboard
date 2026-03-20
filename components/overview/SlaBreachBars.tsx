@@ -1,5 +1,6 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { useAppStore } from '@/lib/store'
 import type { Stats } from '@/types'
 
@@ -50,9 +51,10 @@ function HorizBar({ label, pct, onClick, isActive }: HorizBarProps) {
 
 export default function SlaBreachBars({ data }: Props) {
   const { setFilter, tier: activeTier, channel: activeChannel } = useAppStore()
+  const router = useRouter()
 
   return (
-    <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', padding: 20 }}>
+    <div className="card-lift" style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', padding: 20 }}>
       <div className="mb-3">
         <span style={{ fontWeight: 500, fontSize: 12, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'Inter, sans-serif' }}>
           SLA breach by segment
@@ -74,7 +76,7 @@ export default function SlaBreachBars({ data }: Props) {
           pct={item.val}
           onClick={() => {
             if (activeTier === item.label) setFilter('tier', null)
-            else setFilter('tier', item.label)
+            else { setFilter('tier', item.label); router.push('/dashboard/detail') }
           }}
           isActive={!activeTier || activeTier === item.label}
         />
@@ -97,7 +99,7 @@ export default function SlaBreachBars({ data }: Props) {
           pct={item.val}
           onClick={() => {
             if (activeChannel === item.label) setFilter('channel', null)
-            else setFilter('channel', item.label)
+            else { setFilter('channel', item.label); router.push('/dashboard/detail') }
           }}
           isActive={!activeChannel || activeChannel === item.label}
         />

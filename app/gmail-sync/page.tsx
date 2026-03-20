@@ -225,11 +225,20 @@ export default function GmailSyncPage() {
 
   const addLog = (msg: string) => setLog(prev => [...prev, msg])
 
+  // If GIS script was already cached when this page loaded, onLoad won't fire
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'google' in window) {
+      initTokenClient()
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const missingClientId = !GOOGLE_CLIENT_ID
 
   // Initialize Google token client once GIS is loaded
   const initTokenClient = () => {
     if (typeof window === 'undefined' || !('google' in window)) return
+    if (tokenClientRef.current) return // already initialized
     tokenClientRef.current = (window as unknown as {
       google: {
         accounts: {
@@ -341,7 +350,12 @@ export default function GmailSyncPage() {
     setLog([])
     setPreview([])
     setError('')
-    tokenClientRef.current.requestAccessToken()
+    try {
+      tokenClientRef.current.requestAccessToken()
+    } catch (err) {
+      setError('Failed to open Google auth: ' + String(err))
+      setStatus('error')
+    }
   }
 
   const PRIORITY_COLORS: Record<string, string> = {

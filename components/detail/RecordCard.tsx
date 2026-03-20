@@ -235,9 +235,14 @@ export default function RecordCard({ account, isExpanded, onToggle, onDraft }: P
           </div>
 
           <div className="flex flex-col items-end gap-1">
-            <span style={{ fontWeight: 600, fontSize: 24, color: pColors.text, fontFamily: 'Inter, sans-serif' }}>
-              {account.topScore}
-            </span>
+            <div className="flex flex-col items-end" style={{ gap: 1 }}>
+              <span style={{ fontSize: 9, fontWeight: 500, color: '#9CA3AF', fontFamily: 'Inter, sans-serif', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                Risk score
+              </span>
+              <span style={{ fontWeight: 700, fontSize: 24, color: pColors.text, fontFamily: 'Inter, sans-serif', lineHeight: 1 }}>
+                {account.topScore}
+              </span>
+            </div>
             <span
               className={isHighPriority ? 'pulse-badge' : ''}
               style={{

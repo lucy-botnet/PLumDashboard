@@ -473,7 +473,7 @@ export default function OverviewPage() {
           )}
 
           {/* Row 1: Score distribution + Donuts */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 14, marginTop: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 14, marginTop: 16, alignItems: 'start' }}>
             <ScoreDistChart data={displayStats.scoreDistribution} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <ChannelDonut data={displayStats.byChannel} />

@@ -67,6 +67,7 @@ export default function DetailPageContent() {
       channel: store.channel,
       tier: store.tier,
       owner: store.owner,
+      b2bOrB2c: store.b2bOrB2c,
       scoreRange: store.scoreRange,
       sortBy: store.sortBy,
       search: store.search,
@@ -94,7 +95,7 @@ export default function DetailPageContent() {
   const totalPages = Math.ceil(totalCount / PAGE_SIZE)
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#F9FAFB' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#0F1128' }}>
       <TopNav />
       <div style={{ marginLeft: SIDEBAR_WIDTH, minHeight: '100vh' }}>
       <FilterBar />

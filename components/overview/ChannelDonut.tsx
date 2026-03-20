@@ -10,9 +10,9 @@ interface Props {
 }
 
 const CHANNELS = [
-  { key: 'WhatsApp', color: '#059669' },
-  { key: 'Slack', color: '#7308E3' },
-  { key: 'Email', color: '#7C3AED' },
+  { key: 'WhatsApp', color: '#34D399' },
+  { key: 'Slack', color: '#A78BFA' },
+  { key: 'Email', color: '#60A5FA' },
 ]
 
 function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<{ name: string; value: number; payload: { total: number } }> }) {
@@ -20,9 +20,9 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
   const d = payload[0]
   const pct = d.payload.total > 0 ? Math.round((d.value / d.payload.total) * 100) : 0
   return (
-    <div style={{ background: 'white', border: '1px solid #EDE8FD', borderRadius: 8, padding: '8px 12px', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
-      <div style={{ fontWeight: 500, fontSize: 12, color: '#1A0A2B' }}>{d.name}</div>
-      <div style={{ fontSize: 11, color: '#6B5E8B', marginTop: 2 }}>{d.value.toLocaleString()} · {pct}%</div>
+    <div style={{ background: '#1E2340', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '8px 12px', boxShadow: '0 4px 16px rgba(0,0,0,0.4)' }}>
+      <div style={{ fontWeight: 500, fontSize: 12, color: '#E8E6F0' }}>{d.name}</div>
+      <div style={{ fontSize: 11, color: '#8B85AA', marginTop: 2 }}>{d.value.toLocaleString()} · {pct}%</div>
     </div>
   )
 }
@@ -49,9 +49,9 @@ export default function ChannelDonut({ data }: Props) {
   }
 
   return (
-    <div className="card-lift" style={{ background: 'white', borderRadius: 12, border: '1px solid #EDE8FD', padding: 20, boxShadow: '0 1px 4px rgba(115,8,227,0.06)' }}>
+    <div className="card-lift" style={{ background: '#161932', borderRadius: 12, border: '1px solid rgba(255,255,255,0.08)', padding: 20, boxShadow: '0 4px 24px rgba(0,0,0,0.3)' }}>
       <div className="mb-2">
-        <span style={{ fontWeight: 500, fontSize: 12, color: '#9E94BC', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'Inter, sans-serif' }}>
+        <span style={{ fontWeight: 500, fontSize: 12, color: '#8B85AA', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'Inter, sans-serif' }}>
           By channel
         </span>
       </div>
@@ -74,7 +74,7 @@ export default function ChannelDonut({ data }: Props) {
                 <Cell
                   key={index}
                   fill={entry.color}
-                  opacity={activeChannel && activeChannel !== entry.name ? 0.3 : 1}
+                  opacity={activeChannel && activeChannel !== entry.name ? 0.25 : 1}
                 />
               ))}
             </Pie>
@@ -82,13 +82,11 @@ export default function ChannelDonut({ data }: Props) {
           </PieChart>
         </ResponsiveContainer>
         {/* Center label */}
-        <div
-          className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none"
-        >
-          <div style={{ fontWeight: 600, fontSize: 20, color: '#1A0A2B', fontFamily: 'Inter, sans-serif' }}>
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+          <div style={{ fontWeight: 600, fontSize: 20, color: '#E8E6F0', fontFamily: 'Inter, sans-serif' }}>
             {total.toLocaleString()}
           </div>
-          <div style={{ fontSize: 11, color: '#6B5E8B', fontFamily: 'Inter, sans-serif' }}>total</div>
+          <div style={{ fontSize: 11, color: '#6B65AA', fontFamily: 'Inter, sans-serif' }}>total</div>
         </div>
       </div>
 
@@ -99,7 +97,7 @@ export default function ChannelDonut({ data }: Props) {
           return (
             <div key={item.name} className="flex items-center gap-1">
               <div style={{ width: 8, height: 8, backgroundColor: item.color, borderRadius: 2 }} />
-              <span style={{ fontSize: 11, color: '#6B5E8B', fontFamily: 'Inter, sans-serif' }}>
+              <span style={{ fontSize: 11, color: '#8B85AA', fontFamily: 'Inter, sans-serif' }}>
                 {item.name} · {item.value.toLocaleString()} · {pct}%
               </span>
             </div>

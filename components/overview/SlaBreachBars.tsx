@@ -16,21 +16,21 @@ interface HorizBarProps {
 }
 
 function HorizBar({ label, pct, onClick, isActive }: HorizBarProps) {
-  const barColor = pct > 90 ? '#DC2626' : '#D97706'
+  const barColor = pct > 90 ? '#F87171' : '#FBBF24'
   return (
     <div
       className="flex items-center gap-2 mb-2 cursor-pointer rounded transition-colors px-1"
       onClick={onClick}
-      style={{ opacity: isActive === false ? 0.4 : 1 }}
-      onMouseEnter={e => ((e.currentTarget as HTMLElement).style.backgroundColor = '#FDFCFF')}
+      style={{ opacity: isActive === false ? 0.35 : 1 }}
+      onMouseEnter={e => ((e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(255,255,255,0.04)')}
       onMouseLeave={e => ((e.currentTarget as HTMLElement).style.backgroundColor = 'transparent')}
     >
-      <span style={{ fontWeight: 400, fontSize: 12, color: '#1A0A2B', width: 80, flexShrink: 0, fontFamily: 'Inter, sans-serif' }}>
+      <span style={{ fontWeight: 400, fontSize: 12, color: '#C4C0D8', width: 80, flexShrink: 0, fontFamily: 'Inter, sans-serif' }}>
         {label}
       </span>
       <div
         className="flex-1 rounded-full overflow-hidden"
-        style={{ height: 6, backgroundColor: '#F3F4F6' }}
+        style={{ height: 6, backgroundColor: 'rgba(255,255,255,0.08)' }}
       >
         <div
           style={{
@@ -54,14 +54,14 @@ export default function SlaBreachBars({ data }: Props) {
   const router = useRouter()
 
   return (
-    <div className="card-lift" style={{ background: 'white', borderRadius: 12, border: '1px solid #EDE8FD', padding: 20, boxShadow: '0 1px 4px rgba(115,8,227,0.06)' }}>
+    <div className="card-lift" style={{ background: '#161932', borderRadius: 12, border: '1px solid rgba(255,255,255,0.08)', padding: 20, boxShadow: '0 4px 24px rgba(0,0,0,0.3)' }}>
       <div className="mb-3">
-        <span style={{ fontWeight: 500, fontSize: 12, color: '#9E94BC', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'Inter, sans-serif' }}>
+        <span style={{ fontWeight: 500, fontSize: 12, color: '#8B85AA', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'Inter, sans-serif' }}>
           SLA breach by segment
         </span>
       </div>
 
-      <div style={{ fontWeight: 400, fontSize: 10, color: '#9E94BC', textTransform: 'uppercase', letterSpacing: '0.08em', fontFamily: 'Inter, sans-serif', marginBottom: 6 }}>
+      <div style={{ fontWeight: 400, fontSize: 10, color: '#6B65AA', textTransform: 'uppercase', letterSpacing: '0.08em', fontFamily: 'Inter, sans-serif', marginBottom: 6 }}>
         By tier
       </div>
 
@@ -82,9 +82,9 @@ export default function SlaBreachBars({ data }: Props) {
         />
       ))}
 
-      <div style={{ height: 1, backgroundColor: '#EDE8FD', margin: '12px 0' }} />
+      <div style={{ height: 1, backgroundColor: 'rgba(255,255,255,0.06)', margin: '12px 0' }} />
 
-      <div style={{ fontWeight: 400, fontSize: 10, color: '#9E94BC', textTransform: 'uppercase', letterSpacing: '0.08em', fontFamily: 'Inter, sans-serif', marginBottom: 6 }}>
+      <div style={{ fontWeight: 400, fontSize: 10, color: '#6B65AA', textTransform: 'uppercase', letterSpacing: '0.08em', fontFamily: 'Inter, sans-serif', marginBottom: 6 }}>
         By channel
       </div>
 

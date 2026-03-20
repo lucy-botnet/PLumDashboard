@@ -9,18 +9,20 @@ const FILTER_LABELS: Partial<Record<keyof FilterState, (v: unknown) => string>> 
   channel: (v) => `Channel: ${v}`,
   tier: (v) => `Tier: ${v}`,
   owner: (v) => `Owner: ${v}`,
+  b2bOrB2c: (v) => `Type: ${v}`,
   scoreRange: (v) => `Score: ${(v as [number, number]).join('–')}`,
   search: (v) => `"${v}"`,
 }
 
 const FILTER_COLORS: Partial<Record<keyof FilterState, { text: string; bg: string; border: string }>> = {
-  priority: { text: '#E53030', bg: '#FDEAEA', border: '#FCA5A5' },
-  channel:  { text: '#7308E3', bg: '#EDE8FD', border: '#C4B5FD' },
-  status:   { text: '#1A0A2B', bg: '#F6F3FF', border: '#D9D0F8' },
-  tier:     { text: '#D97706', bg: '#FEF3C7', border: '#FCD34D' },
-  owner:    { text: '#6B5E8B', bg: '#F6F3FF', border: '#D9D0F8' },
-  scoreRange: { text: '#7308E3', bg: '#EDE8FD', border: '#C4B5FD' },
-  search:   { text: '#1A0A2B', bg: '#F6F3FF', border: '#D9D0F8' },
+  priority:   { text: '#F87171', bg: 'rgba(248,113,113,0.12)', border: 'rgba(248,113,113,0.3)' },
+  channel:    { text: '#A78BFA', bg: 'rgba(167,139,250,0.12)', border: 'rgba(167,139,250,0.3)' },
+  status:     { text: '#C4C0D8', bg: 'rgba(255,255,255,0.06)', border: 'rgba(255,255,255,0.15)' },
+  tier:       { text: '#FBBF24', bg: 'rgba(251,191,36,0.12)', border: 'rgba(251,191,36,0.3)' },
+  owner:      { text: '#8B85AA', bg: 'rgba(255,255,255,0.06)', border: 'rgba(255,255,255,0.12)' },
+  b2bOrB2c:  { text: '#34D399', bg: 'rgba(52,211,153,0.12)', border: 'rgba(52,211,153,0.3)' },
+  scoreRange: { text: '#A78BFA', bg: 'rgba(167,139,250,0.12)', border: 'rgba(167,139,250,0.3)' },
+  search:     { text: '#C4C0D8', bg: 'rgba(255,255,255,0.06)', border: 'rgba(255,255,255,0.12)' },
 }
 
 export default function FilterBar() {
@@ -34,7 +36,7 @@ export default function FilterBar() {
     .map(([key, labelFn]) => ({
       key: key as keyof FilterState,
       label: labelFn!(store[key as keyof FilterState]),
-      colors: FILTER_COLORS[key as keyof FilterState] || { text: '#6B5E8B', bg: '#F6F3FF', border: '#D9D0F8' },
+      colors: FILTER_COLORS[key as keyof FilterState] || { text: '#8B85AA', bg: 'rgba(255,255,255,0.06)', border: 'rgba(255,255,255,0.12)' },
     }))
 
   if (activeFilters.length === 0) return null
@@ -46,12 +48,12 @@ export default function FilterBar() {
         alignItems: 'center',
         gap: 8,
         padding: '8px 20px',
-        backgroundColor: '#F6F3FF',
-        borderBottom: '1px solid #EDE8FD',
+        backgroundColor: 'rgba(167,139,250,0.06)',
+        borderBottom: '1px solid rgba(255,255,255,0.06)',
         flexWrap: 'wrap',
       }}
     >
-      <span style={{ fontWeight: 500, fontSize: 11, color: '#9E94BC', fontFamily: 'Inter, sans-serif', letterSpacing: '0.05em' }}>
+      <span style={{ fontWeight: 500, fontSize: 11, color: '#6B65AA', fontFamily: 'Inter, sans-serif', letterSpacing: '0.05em' }}>
         FILTERED BY
       </span>
 
@@ -102,7 +104,7 @@ export default function FilterBar() {
           cursor: 'pointer',
           fontWeight: 600,
           fontSize: 11,
-          color: '#7308E3',
+          color: '#A78BFA',
           fontFamily: 'Inter, sans-serif',
           letterSpacing: '0.02em',
           padding: '0',

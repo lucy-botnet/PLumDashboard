@@ -12,12 +12,12 @@ interface Props {
 }
 
 const BRACKETS = [
-  { range: '0–30', key: '0-30', color: '#059669', min: 0, max: 30 },
-  { range: '31–45', key: '31-45', color: '#059669', min: 31, max: 45 },
-  { range: '46–60', key: '46-60', color: '#D97706', min: 46, max: 60 },
-  { range: '61–70', key: '61-70', color: '#D97706', min: 61, max: 70 },
-  { range: '71–85', key: '71-85', color: '#DC2626', min: 71, max: 85 },
-  { range: '86–100', key: '86-100', color: '#DC2626', min: 86, max: 100 },
+  { range: '0–30', key: '0-30', color: '#34D399', min: 0, max: 30 },
+  { range: '31–45', key: '31-45', color: '#34D399', min: 31, max: 45 },
+  { range: '46–60', key: '46-60', color: '#FBBF24', min: 46, max: 60 },
+  { range: '61–70', key: '61-70', color: '#FBBF24', min: 61, max: 70 },
+  { range: '71–85', key: '71-85', color: '#F87171', min: 71, max: 85 },
+  { range: '86–100', key: '86-100', color: '#F87171', min: 86, max: 100 },
 ]
 
 function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<{ payload: { range: string; count: number; total: number } }> }) {
@@ -25,9 +25,9 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
   const d = payload[0].payload
   const pct = d.total > 0 ? Math.round((d.count / d.total) * 100) : 0
   return (
-    <div style={{ background: 'white', border: '1px solid #EDE8FD', borderRadius: 8, padding: '8px 12px', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
-      <div style={{ fontWeight: 500, fontSize: 12, color: '#1A0A2B' }}>Score {d.range}</div>
-      <div style={{ fontSize: 11, color: '#6B5E8B', marginTop: 2 }}>{d.count.toLocaleString()} escalations · {pct}%</div>
+    <div style={{ background: '#1E2340', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '8px 12px', boxShadow: '0 4px 16px rgba(0,0,0,0.4)' }}>
+      <div style={{ fontWeight: 500, fontSize: 12, color: '#E8E6F0' }}>Score {d.range}</div>
+      <div style={{ fontSize: 11, color: '#8B85AA', marginTop: 2 }}>{d.count.toLocaleString()} escalations · {pct}%</div>
     </div>
   )
 }
@@ -60,24 +60,24 @@ export default function ScoreDistChart({ data }: Props) {
   }
 
   return (
-    <div className="card-lift" style={{ background: 'white', borderRadius: 12, border: '1px solid #EDE8FD', padding: 20, boxShadow: '0 1px 4px rgba(115,8,227,0.06)' }}>
+    <div className="card-lift" style={{ background: '#161932', borderRadius: 12, border: '1px solid rgba(255,255,255,0.08)', padding: 20, boxShadow: '0 4px 24px rgba(0,0,0,0.3)' }}>
       <div className="flex justify-between items-center mb-3">
-        <span style={{ fontWeight: 500, fontSize: 12, color: '#9E94BC', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'Inter, sans-serif' }}>
+        <span style={{ fontWeight: 500, fontSize: 12, color: '#8B85AA', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'Inter, sans-serif' }}>
           Score distribution
         </span>
-        <span style={{ fontSize: 11, color: '#9E94BC', fontFamily: 'Inter, sans-serif' }}>Open escalations</span>
+        <span style={{ fontSize: 11, color: '#6B65AA', fontFamily: 'Inter, sans-serif' }}>Open escalations</span>
       </div>
 
       {/* Legend */}
       <div className="flex gap-4 mb-3">
         {[
-          { color: '#059669', label: 'Low <45', count: low },
-          { color: '#D97706', label: 'Medium 45–69', count: medium },
-          { color: '#DC2626', label: 'High 70–100', count: high },
+          { color: '#34D399', label: 'Low <45', count: low },
+          { color: '#FBBF24', label: 'Medium 45–69', count: medium },
+          { color: '#F87171', label: 'High 70–100', count: high },
         ].map(item => (
           <div key={item.label} className="flex items-center gap-1.5">
             <div style={{ width: 8, height: 8, backgroundColor: item.color, borderRadius: 2 }} />
-            <span style={{ fontSize: 11, color: '#6B5E8B', fontFamily: 'Inter, sans-serif' }}>
+            <span style={{ fontSize: 11, color: '#8B85AA', fontFamily: 'Inter, sans-serif' }}>
               {item.label} · {item.count.toLocaleString()}
             </span>
           </div>
@@ -86,9 +86,9 @@ export default function ScoreDistChart({ data }: Props) {
 
       <ResponsiveContainer width="100%" height={180}>
         <BarChart data={chartData} margin={{ top: 4, right: 0, left: -20, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
-          <XAxis dataKey="range" tick={{ fontSize: 11, fill: '#6B5E8B' }} axisLine={false} tickLine={false} />
-          <YAxis tick={{ fontSize: 10, fill: '#6B5E8B' }} axisLine={false} tickLine={false} tickCount={4} />
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+          <XAxis dataKey="range" tick={{ fontSize: 11, fill: '#6B65AA' }} axisLine={false} tickLine={false} />
+          <YAxis tick={{ fontSize: 10, fill: '#6B65AA' }} axisLine={false} tickLine={false} tickCount={4} />
           <Tooltip content={<CustomTooltip />} />
           <Bar dataKey="count" radius={[6, 6, 0, 0]} animationDuration={600} animationEasing="ease-out"
             onClick={(entry) => handleBarClick(entry as { min: number; max: number })}>
@@ -99,7 +99,7 @@ export default function ScoreDistChart({ data }: Props) {
                 <Cell
                   key={index}
                   fill={entry.color}
-                  opacity={hasSelection && !isSelected ? 0.3 : 1}
+                  opacity={hasSelection && !isSelected ? 0.25 : 1}
                   cursor="pointer"
                 />
               )

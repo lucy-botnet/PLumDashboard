@@ -28,11 +28,11 @@ function KpiCell({ value, label, sub, accent, accentBg, barPct, icon, onClick }:
         position: 'relative',
         overflow: 'hidden',
         transition: 'background 150ms',
-        background: 'white',
+        background: 'transparent',
       }}
       onClick={onClick}
-      onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = '#FDFCFF')}
-      onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'white')}
+      onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)')}
+      onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
     >
       {/* Icon badge */}
       <div
@@ -54,15 +54,15 @@ function KpiCell({ value, label, sub, accent, accentBg, barPct, icon, onClick }:
       <div style={{ fontWeight: 700, fontSize: 32, color: accent, fontFamily: 'Inter, sans-serif', lineHeight: 1, letterSpacing: '-1px' }}>
         {value}
       </div>
-      <div style={{ fontWeight: 500, fontSize: 12, color: '#1A0A2B', fontFamily: 'Inter, sans-serif', marginTop: 4 }}>
+      <div style={{ fontWeight: 500, fontSize: 12, color: '#E8E6F0', fontFamily: 'Inter, sans-serif', marginTop: 4 }}>
         {label}
       </div>
-      <div style={{ fontWeight: 400, fontSize: 11, color: '#9E94BC', fontFamily: 'Inter, sans-serif', marginTop: 2 }}>
+      <div style={{ fontWeight: 400, fontSize: 11, color: '#6B65AA', fontFamily: 'Inter, sans-serif', marginTop: 2 }}>
         {sub}
       </div>
 
       {/* Bottom progress bar */}
-      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 3, backgroundColor: '#F6F3FF' }}>
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 3, backgroundColor: 'rgba(255,255,255,0.06)' }}>
         <div
           style={{
             height: '100%',
@@ -95,8 +95,8 @@ export default function KpiStrip({ stats }: Props) {
       value: stats.totalOpen.toLocaleString(),
       label: 'Total open',
       sub: `${stats.high + stats.medium + stats.low} active`,
-      accent: '#7308E3',
-      accentBg: '#EDE8FD',
+      accent: '#A78BFA',
+      accentBg: 'rgba(167,139,250,0.15)',
       barPct: 100,
       icon: '📋',
       onClick: () => goToDetail(),
@@ -105,8 +105,8 @@ export default function KpiStrip({ stats }: Props) {
       value: stats.high.toLocaleString(),
       label: 'High priority',
       sub: `${highPct}% of total`,
-      accent: '#E53030',
-      accentBg: '#FDEAEA',
+      accent: '#F87171',
+      accentBg: 'rgba(248,113,113,0.15)',
       barPct: highPct,
       icon: '🔴',
       onClick: () => goToDetail('High'),
@@ -115,8 +115,8 @@ export default function KpiStrip({ stats }: Props) {
       value: stats.blocked.toLocaleString(),
       label: 'Blocked',
       sub: `${blockedPct}% of open`,
-      accent: '#D97706',
-      accentBg: '#FEF3C7',
+      accent: '#FBBF24',
+      accentBg: 'rgba(251,191,36,0.15)',
       barPct: blockedPct,
       icon: '⛔',
       onClick: () => goToDetail(undefined, 'Blocked'),
@@ -125,8 +125,8 @@ export default function KpiStrip({ stats }: Props) {
       value: `${slaBrechPct}%`,
       label: 'SLA breach rate',
       sub: `${stats.slaBreach} of ${stats.totalOpen}`,
-      accent: slaBrechPct > 50 ? '#E53030' : '#D97706',
-      accentBg: slaBrechPct > 50 ? '#FDEAEA' : '#FEF3C7',
+      accent: slaBrechPct > 50 ? '#F87171' : '#FBBF24',
+      accentBg: slaBrechPct > 50 ? 'rgba(248,113,113,0.15)' : 'rgba(251,191,36,0.15)',
       barPct: slaBrechPct,
       icon: '⏱',
       onClick: () => goToDetail(),
@@ -138,17 +138,17 @@ export default function KpiStrip({ stats }: Props) {
       style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(4, 1fr)',
-        backgroundColor: 'white',
-        border: '1px solid #EDE8FD',
+        backgroundColor: '#161932',
+        border: '1px solid rgba(255,255,255,0.08)',
         borderRadius: 14,
         overflow: 'hidden',
-        boxShadow: '0 1px 4px rgba(115,8,227,0.06)',
+        boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
       }}
     >
       {cells.map((cell, i) => (
         <div
           key={cell.label}
-          style={{ borderRight: i < cells.length - 1 ? '1px solid #EDE8FD' : 'none' }}
+          style={{ borderRight: i < cells.length - 1 ? '1px solid rgba(255,255,255,0.08)' : 'none' }}
         >
           <KpiCell {...cell} />
         </div>

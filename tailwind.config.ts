@@ -10,15 +10,22 @@ const config: Config = {
     extend: {
       colors: {
         plum: {
-          primary: '#4F46E5',
-          accent: '#7C3AED',
-          danger: '#DC2626',
-          warning: '#D97706',
-          success: '#059669',
-          text: '#111827',
-          muted: '#6B7280',
-          surface: '#F9FAFB',
-          border: '#E5E7EB',
+          primary:   '#7308E3',
+          dark:      '#5A06B5',
+          deep:      '#3D0488',
+          light:     '#EDE8FD',
+          xlight:    '#F6F3FF',
+          haiti:     '#1A0A2B',
+          haiti2:    '#251540',
+          haiti3:    '#3B2260',
+          border:    '#EDE8FD',
+          border2:   '#D9D0F8',
+          text:      '#1A0A2B',
+          text2:     '#6B5E8B',
+          text3:     '#9E94BC',
+          danger:    '#E53030',
+          warning:   '#D97706',
+          success:   '#059669',
         },
       },
       fontFamily: {
@@ -30,7 +37,9 @@ const config: Config = {
         pill: '20px',
       },
       boxShadow: {
-        card: '0 1px 3px rgba(0,0,0,0.08)',
+        card:   '0 1px 4px rgba(115,8,227,0.06)',
+        'card-md': '0 4px 16px rgba(115,8,227,0.10)',
+        glow:   '0 0 8px rgba(115,8,227,0.8)',
       },
       animation: {
         'ping-slow': 'ping 2s cubic-bezier(0, 0, 0.2, 1) infinite',

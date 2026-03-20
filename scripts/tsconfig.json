@@ -10,9 +10,9 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "outDir": "./dist",
-    "rootDir": "..",
+    "baseUrl": "..",
     "paths": {
-      "@/*": ["../"]
+      "@/*": ["./"]
     }
   },
   "include": ["../scripts/**/*.ts", "../lib/**/*.ts", "../types/**/*.ts"],

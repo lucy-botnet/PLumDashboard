@@ -20,10 +20,10 @@ const selectStyle: React.CSSProperties = {
   fontWeight: 400,
   fontSize: 12,
   padding: '7px 10px',
-  border: '1px solid #EDE8FD',
+  border: '1px solid #2D3561',
   borderRadius: 8,
-  backgroundColor: 'white',
-  color: '#1A0A2B',
+  backgroundColor: '#1A1F3A',
+  color: '#F1F5F9',
   fontFamily: 'Inter, sans-serif',
   outline: 'none',
   cursor: 'pointer',
@@ -33,7 +33,7 @@ const selectStyle: React.CSSProperties = {
 const labelStyle: React.CSSProperties = {
   fontWeight: 600,
   fontSize: 9,
-  color: '#9E94BC',
+  color: '#475569',
   textTransform: 'uppercase',
   letterSpacing: '0.1em',
   fontFamily: 'Inter, sans-serif',
@@ -72,8 +72,8 @@ export default function FilterStrip({ totalAccounts, totalEscalations, owners }:
           gap: 10,
           flexWrap: 'wrap',
           padding: '12px 20px',
-          borderBottom: '1px solid #EDE8FD',
-          backgroundColor: 'white',
+          borderBottom: '1px solid #2D3561',
+          backgroundColor: '#1A1F3A',
         }}
       >
         {/* Priority */}
@@ -124,6 +124,18 @@ export default function FilterStrip({ totalAccounts, totalEscalations, owners }:
           </select>
         </div>
 
+        {/* Type (B2B / B2C) */}
+        <div>
+          <label style={labelStyle}>Type</label>
+          <select
+            style={selectStyle}
+            value={store.b2bOrB2c || 'All'}
+            onChange={e => handleSelect('b2bOrB2c', e.target.value)}
+          >
+            {['All', 'B2B', 'B2C'].map(v => <option key={v}>{v}</option>)}
+          </select>
+        </div>
+
         {/* Owner */}
         <div>
           <label style={labelStyle}>Owner</label>
@@ -150,8 +162,8 @@ export default function FilterStrip({ totalAccounts, totalEscalations, owners }:
               width: '100%',
               boxSizing: 'border-box',
             }}
-            onFocus={e => ((e.target as HTMLInputElement).style.borderColor = '#7308E3')}
-            onBlur={e => ((e.target as HTMLInputElement).style.borderColor = '#EDE8FD')}
+            onFocus={e => ((e.target as HTMLInputElement).style.borderColor = '#4F46E5')}
+            onBlur={e => ((e.target as HTMLInputElement).style.borderColor = '#2D3561')}
           />
         </div>
 
@@ -166,9 +178,9 @@ export default function FilterStrip({ totalAccounts, totalEscalations, owners }:
                 fontSize: 11,
                 padding: '5px 12px',
                 borderRadius: 20,
-                border: store.sortBy === opt.value ? '1.5px solid #7308E3' : '1px solid #EDE8FD',
-                backgroundColor: store.sortBy === opt.value ? '#7308E3' : 'white',
-                color: store.sortBy === opt.value ? 'white' : '#6B5E8B',
+                border: store.sortBy === opt.value ? '1.5px solid #4F46E5' : '1px solid #2D3561',
+                backgroundColor: store.sortBy === opt.value ? '#4F46E5' : '#1A1F3A',
+                color: store.sortBy === opt.value ? 'white' : '#94A3B8',
                 fontFamily: 'Inter, sans-serif',
                 cursor: 'pointer',
                 transition: 'all 150ms',
@@ -184,25 +196,18 @@ export default function FilterStrip({ totalAccounts, totalEscalations, owners }:
       <div
         style={{
           padding: '7px 20px',
-          borderBottom: '1px solid #EDE8FD',
-          backgroundColor: '#FDFCFF',
+          borderBottom: '1px solid #2D3561',
+          backgroundColor: '#0F1128',
           display: 'flex',
           alignItems: 'center',
           gap: 8,
         }}
       >
-        <div
-          style={{
-            width: 6,
-            height: 6,
-            borderRadius: '50%',
-            backgroundColor: '#7308E3',
-          }}
-        />
-        <span style={{ fontWeight: 400, fontSize: 12, color: '#6B5E8B', fontFamily: 'Inter, sans-serif' }}>
-          <strong style={{ color: '#1A0A2B', fontWeight: 600 }}>{totalAccounts.toLocaleString()}</strong> accounts
+        <div style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#4F46E5' }} />
+        <span style={{ fontWeight: 400, fontSize: 12, color: '#94A3B8', fontFamily: 'Inter, sans-serif' }}>
+          <strong style={{ color: '#F1F5F9', fontWeight: 600 }}>{totalAccounts.toLocaleString()}</strong> accounts
           {' · '}
-          <strong style={{ color: '#1A0A2B', fontWeight: 600 }}>{totalEscalations.toLocaleString()}</strong> escalations
+          <strong style={{ color: '#F1F5F9', fontWeight: 600 }}>{totalEscalations.toLocaleString()}</strong> escalations
         </span>
       </div>
     </>

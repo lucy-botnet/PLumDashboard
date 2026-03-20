@@ -4,6 +4,11 @@ import type { EscalationRow, FilterState, GroupedAccount, Stats } from '@/types'
 const PAGE_SIZE = 20
 
 export async function fetchStats(since?: string): Promise<Stats> {
+  const now = new Date()
+  const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
+  const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString()
+  const lastMonthEnd = currentMonthStart
+
   // Build base queries with optional date filter
   let q0 = supabase.from('escalations').select('priority_bucket, age_hours, sla_hours, score, dim_business, dim_time_age, dim_comms, dim_complexity, dim_risk, dim_ownership, dim_historical').neq('current_status', 'Closed')
   let q1 = supabase.from('escalations').select('channel, score').neq('current_status', 'Closed')
@@ -25,6 +30,42 @@ export async function fetchStats(since?: string): Promise<Stats> {
     q7 = q7.gte('created_at', since)
   }
 
+  // New data queries
+  const qRootCause = supabase
+    .from('escalations')
+    .select('root_cause, resolution_hours, b2b_or_b2c')
+    .not('root_cause', 'is', null)
+
+  const qB2b = supabase
+    .from('escalations')
+    .select('b2b_or_b2c, priority_bucket')
+    .neq('current_status', 'Closed')
+
+  const qResponseCsat = supabase
+    .from('escalations')
+    .select('first_response_hours, csat_score, resolved_at, current_status, created_at')
+
+  const qTimeline = supabase
+    .from('escalations')
+    .select('created_at, resolved_at')
+    .order('created_at', { ascending: true })
+
+  const qOpenHigh = supabase
+    .from('escalations')
+    .select('*')
+    .eq('priority_bucket', 'High')
+    .neq('current_status', 'Closed')
+    .not('max_resolution_hours', 'is', null)
+    .order('age_hours', { ascending: false })
+    .limit(5)
+
+  const qPerformers = supabase
+    .from('escalations')
+    .select('resolved_by, employee_id, resolved_at')
+    .not('resolved_at', 'is', null)
+    .not('resolved_by', 'is', null)
+    .gte('resolved_at', currentMonthStart)
+
   const [
     openRes,
     channelRes,
@@ -34,7 +75,13 @@ export async function fetchStats(since?: string): Promise<Stats> {
     oldestRes,
     ownerRes,
     allScoresRes,
-  ] = await Promise.all([q0, q1, q2, q3, q4, q5, q6, q7])
+    rootCauseRes,
+    b2bRes,
+    responseCsatRes,
+    timelineRes,
+    openHighRes,
+    performersRes,
+  ] = await Promise.all([q0, q1, q2, q3, q4, q5, q6, q7, qRootCause, qB2b, qResponseCsat, qTimeline, qOpenHigh, qPerformers])
 
   const openRows = openRes.data || []
   const channelRows = channelRes.data || []
@@ -44,6 +91,12 @@ export async function fetchStats(since?: string): Promise<Stats> {
   const oldestCases = (oldestRes.data || []) as EscalationRow[]
   const ownerRows = ownerRes.data || []
   const allRows = allScoresRes.data || []
+  const rootCauseRows = rootCauseRes.data || []
+  const b2bRows = b2bRes.data || []
+  const rcRows = responseCsatRes.data || []
+  const timelineRows = timelineRes.data || []
+  const openHighRows = (openHighRes.data || []) as EscalationRow[]
+  const performerRows = performersRes.data || []
 
   const totalOpen = openRows.length
   const high = openRows.filter(r => r.priority_bucket === 'High').length
@@ -140,6 +193,101 @@ export async function fetchStats(since?: string): Promise<Stats> {
     .sort((a, b) => b.count - a.count)
     .slice(0, 5)
 
+  // Root cause analysis
+  const causeMap: Record<string, { count: number; totalResHours: number; b2bCount: number }> = {}
+  rootCauseRows.forEach(r => {
+    const cause = r.root_cause || 'Unknown'
+    if (!causeMap[cause]) causeMap[cause] = { count: 0, totalResHours: 0, b2bCount: 0 }
+    causeMap[cause].count++
+    if (r.resolution_hours) causeMap[cause].totalResHours += r.resolution_hours
+    if (r.b2b_or_b2c === 'B2B') causeMap[cause].b2bCount++
+  })
+  const rootCauseData = Object.entries(causeMap)
+    .map(([cause, { count, totalResHours, b2bCount }]) => ({
+      cause,
+      count,
+      avgResolutionHours: count > 0 ? Math.round(totalResHours / count) : 0,
+      b2bPct: count > 0 ? Math.round((b2bCount / count) * 100) : 0,
+    }))
+    .sort((a, b) => b.count - a.count)
+
+  // B2B vs B2C
+  const b2bCount = b2bRows.filter(r => r.b2b_or_b2c === 'B2B').length
+  const b2cCount = b2bRows.filter(r => r.b2b_or_b2c === 'B2C').length
+  const priorityB2bMap: Record<string, { b2b: number; b2c: number }> = {
+    High: { b2b: 0, b2c: 0 },
+    Medium: { b2b: 0, b2c: 0 },
+    Low: { b2b: 0, b2c: 0 },
+  }
+  b2bRows.forEach(r => {
+    const p = r.priority_bucket as string
+    if (priorityB2bMap[p]) {
+      if (r.b2b_or_b2c === 'B2B') priorityB2bMap[p].b2b++
+      else if (r.b2b_or_b2c === 'B2C') priorityB2bMap[p].b2c++
+    }
+  })
+  const byPriority = ['High', 'Medium', 'Low'].map(p => ({
+    priority: p,
+    b2b: priorityB2bMap[p].b2b,
+    b2c: priorityB2bMap[p].b2c,
+  }))
+
+  // Response time & CSAT
+  const lastMonthRcRows = rcRows.filter(r => r.created_at >= lastMonthStart && r.created_at < lastMonthEnd)
+  const currentMonthRcRows = rcRows.filter(r => r.created_at >= currentMonthStart)
+  function avgNum(rows: typeof rcRows, key: string) {
+    const vals = rows.map(r => (r as Record<string, unknown>)[key] as number).filter(v => v != null && !isNaN(v))
+    return vals.length ? Math.round((vals.reduce((a, b) => a + b, 0) / vals.length) * 10) / 10 : 0
+  }
+  const responseCsat: Stats['responseCsat'] = {
+    lastMonthAvgResponseHours: avgNum(lastMonthRcRows, 'first_response_hours'),
+    currentMonthAvgResponseHours: avgNum(currentMonthRcRows, 'first_response_hours'),
+    lastMonthCsat: avgNum(lastMonthRcRows.filter(r => r.current_status === 'Closed'), 'csat_score'),
+    currentMonthCsat: avgNum(currentMonthRcRows.filter(r => r.current_status === 'Closed'), 'csat_score'),
+  }
+
+  // Tickets trend (last 6 months by month)
+  const monthMap: Record<string, { raised: number; resolved: number }> = {}
+  const sixMonthsAgo = new Date(now)
+  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
+  timelineRows.forEach(r => {
+    if (r.created_at) {
+      const d = new Date(r.created_at)
+      if (d >= sixMonthsAgo) {
+        const key = d.toLocaleString('en-US', { month: 'short', year: '2-digit' })
+        if (!monthMap[key]) monthMap[key] = { raised: 0, resolved: 0 }
+        monthMap[key].raised++
+      }
+    }
+    if (r.resolved_at) {
+      const d = new Date(r.resolved_at)
+      if (d >= sixMonthsAgo) {
+        const key = d.toLocaleString('en-US', { month: 'short', year: '2-digit' })
+        if (!monthMap[key]) monthMap[key] = { raised: 0, resolved: 0 }
+        monthMap[key].resolved++
+      }
+    }
+  })
+  const ticketsTrend = Object.entries(monthMap)
+    .sort((a, b) => {
+      const da = new Date('1 ' + a[0].replace("'", ' 20'))
+      const db = new Date('1 ' + b[0].replace("'", ' 20'))
+      return da.getTime() - db.getTime()
+    })
+    .map(([period, { raised, resolved }]) => ({ period, raised, resolved }))
+
+  // Top performers
+  const perfMap: Record<string, { resolved: number; employeeId: string | null }> = {}
+  performerRows.forEach(r => {
+    const name = r.resolved_by || 'Unknown'
+    if (!perfMap[name]) perfMap[name] = { resolved: 0, employeeId: r.employee_id }
+    perfMap[name].resolved++
+  })
+  const topPerformers = Object.entries(perfMap)
+    .map(([name, { resolved, employeeId }]) => ({ name, resolved, employeeId }))
+    .sort((a, b) => b.resolved - a.resolved)
+    .slice(0, 5)
+
   return {
     totalOpen,
     high,
@@ -157,6 +305,12 @@ export async function fetchStats(since?: string): Promise<Stats> {
     slaBreachBySegment,
     oldestCases,
     ownershipLoad,
+    rootCauseData,
+    b2bVsB2c: { b2bCount, b2cCount, byPriority },
+    responseCsat,
+    openHighPriorityForTimeline: openHighRows,
+    ticketsTrend,
+    topPerformers,
   }
 }
 
@@ -170,6 +324,7 @@ export async function fetchEscalations(
   if (filters.channel) query = query.eq('channel', filters.channel)
   if (filters.tier) query = query.eq('account_tier', filters.tier)
   if (filters.owner) query = query.eq('owner', filters.owner)
+  if (filters.b2bOrB2c) query = query.eq('b2b_or_b2c', filters.b2bOrB2c)
   if (filters.scoreRange) {
     query = query.gte('score', filters.scoreRange[0]).lte('score', filters.scoreRange[1])
   }

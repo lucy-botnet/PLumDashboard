@@ -12,6 +12,11 @@ import SlaBreachBars from '@/components/overview/SlaBreachBars'
 import AgedCases from '@/components/overview/AgedCases'
 import OwnershipLoad from '@/components/overview/OwnershipLoad'
 import AvgScoreChart from '@/components/overview/AvgScoreChart'
+import ResponseCsatStrip from '@/components/overview/ResponseCsatStrip'
+import TicketsTrendChart from '@/components/overview/TicketsTrendChart'
+import RootCauseChart from '@/components/overview/RootCauseChart'
+import ResolutionTimeline from '@/components/overview/ResolutionTimeline'
+import B2BvsB2C from '@/components/overview/B2BvsB2C'
 import { SkeletonKpi } from '@/components/ui/Skeleton'
 import { fetchStats, fetchRecentEscalations } from '@/lib/queries'
 import { useAppStore } from '@/lib/store'
@@ -48,32 +53,32 @@ const FALLBACK_STATS: Stats = {
   slaBreachBySegment: { Enterprise: 0, 'Mid-Market': 0, SMB: 0, WhatsApp: 0, Slack: 0, Email: 0 },
   oldestCases: [],
   ownershipLoad: [],
+  rootCauseData: [],
+  b2bVsB2c: { b2bCount: 0, b2cCount: 0, byPriority: [] },
+  responseCsat: { lastMonthAvgResponseHours: 0, currentMonthAvgResponseHours: 0, lastMonthCsat: 0, currentMonthCsat: 0 },
+  openHighPriorityForTimeline: [],
+  ticketsTrend: [],
+  topPerformers: [],
 }
 
 const PRIORITY_COLORS = {
-  High: { text: '#DC2626', bg: '#FCEBEB' },
-  Medium: { text: '#D97706', bg: '#FEF3C7' },
-  Low: { text: '#059669', bg: '#D1FAE5' },
+  High: { text: '#EF4444', bg: 'rgba(239,68,68,0.15)' },
+  Medium: { text: '#F59E0B', bg: 'rgba(245,158,11,0.15)' },
+  Low: { text: '#10B981', bg: 'rgba(16,185,129,0.12)' },
 }
 const CHANNEL_COLORS: Record<string, string> = {
-  WhatsApp: '#059669', Slack: '#4F46E5', Email: '#7C3AED',
+  WhatsApp: '#10B981', Slack: '#4F46E5', Email: '#8B5CF6',
 }
 const STATUS_COLORS: Record<string, { text: string; bg: string }> = {
-  Blocked: { text: '#DC2626', bg: '#FCEBEB' },
-  Open: { text: '#D97706', bg: '#FEF3C7' },
-  'In Progress': { text: '#4F46E5', bg: '#EEF2FF' },
-  Closed: { text: '#059669', bg: '#D1FAE5' },
+  Blocked: { text: '#EF4444', bg: 'rgba(239,68,68,0.15)' },
+  Open: { text: '#F59E0B', bg: 'rgba(245,158,11,0.15)' },
+  'In Progress': { text: '#4F46E5', bg: 'rgba(79,70,229,0.15)' },
+  Closed: { text: '#10B981', bg: 'rgba(16,185,129,0.12)' },
 }
 
-function RecentEscalationTable({
-  rows,
-  emptyLabel,
-}: {
-  rows: EscalationRow[]
-  emptyLabel: string
-}) {
+function RecentEscalationTable({ rows, emptyLabel }: { rows: EscalationRow[]; emptyLabel: string }) {
   const router = useRouter()
-  const { setFilter, clearAllFilters } = useAppStore()
+  const { clearAllFilters } = useAppStore()
 
   const handleRowClick = (esc: EscalationRow) => {
     clearAllFilters()
@@ -82,7 +87,7 @@ function RecentEscalationTable({
 
   if (rows.length === 0) {
     return (
-      <div style={{ textAlign: 'center', padding: '20px 0', color: '#9E94BC', fontSize: 12, fontFamily: 'Inter, sans-serif' }}>
+      <div style={{ textAlign: 'center', padding: '12px 0', color: '#475569', fontSize: 12, fontFamily: 'Inter, sans-serif' }}>
         {emptyLabel}
       </div>
     )
@@ -90,21 +95,9 @@ function RecentEscalationTable({
 
   return (
     <div>
-      {/* Table header */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 90px 80px 60px 60px 80px',
-          gap: 8,
-          padding: '6px 14px',
-          borderBottom: '1px solid #F3F4F6',
-        }}
-      >
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 80px 70px 50px 50px 75px', gap: 6, padding: '5px 12px', borderBottom: '1px solid #2D3561' }}>
         {['Account', 'Priority', 'Channel', 'Score', 'Age', 'Status'].map(h => (
-          <span
-            key={h}
-            style={{ fontSize: 10, fontWeight: 600, color: '#9E94BC', fontFamily: 'Inter, sans-serif', textTransform: 'uppercase', letterSpacing: '0.06em' }}
-          >
+          <span key={h} style={{ fontSize: 9, fontWeight: 600, color: '#475569', fontFamily: 'Inter, sans-serif', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
             {h}
           </span>
         ))}
@@ -117,91 +110,27 @@ function RecentEscalationTable({
           <div
             key={esc.id}
             onClick={() => handleRowClick(esc)}
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 90px 80px 60px 60px 80px',
-              gap: 8,
-              padding: '8px 14px',
-              borderBottom: '1px solid #F6F3FF',
-              cursor: 'pointer',
-              transition: 'background 120ms',
-            }}
-            onMouseEnter={e => ((e.currentTarget as HTMLElement).style.backgroundColor = '#FDFCFF')}
+            style={{ display: 'grid', gridTemplateColumns: '1fr 80px 70px 50px 50px 75px', gap: 6, padding: '7px 12px', borderBottom: '1px solid rgba(45,53,97,0.5)', cursor: 'pointer', transition: 'background 120ms' }}
+            onMouseEnter={e => ((e.currentTarget as HTMLElement).style.backgroundColor = '#1E2952')}
             onMouseLeave={e => ((e.currentTarget as HTMLElement).style.backgroundColor = 'transparent')}
           >
-            <span
-              style={{
-                fontWeight: 500,
-                fontSize: 12,
-                color: '#1A0A2B',
-                fontFamily: 'Inter, sans-serif',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
+            <span style={{ fontWeight: 500, fontSize: 11, color: '#F1F5F9', fontFamily: 'Inter, sans-serif', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {esc.account_name}
             </span>
-            <span
-              style={{
-                fontSize: 10,
-                fontWeight: 600,
-                color: pColors.text,
-                backgroundColor: pColors.bg,
-                borderRadius: 12,
-                padding: '2px 8px',
-                textAlign: 'center',
-                alignSelf: 'center',
-                fontFamily: 'Inter, sans-serif',
-              }}
-            >
+            <span style={{ fontSize: 9, fontWeight: 600, color: pColors.text, backgroundColor: pColors.bg, borderRadius: 12, padding: '2px 7px', textAlign: 'center', alignSelf: 'center', fontFamily: 'Inter, sans-serif' }}>
               {esc.priority_bucket}
             </span>
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <div
-                style={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: '50%',
-                  backgroundColor: CHANNEL_COLORS[esc.channel] || '#6B5E8B',
-                  flexShrink: 0,
-                }}
-              />
-              <span style={{ fontSize: 11, color: '#6B5E8B', fontFamily: 'Inter, sans-serif' }}>{esc.channel}</span>
+              <div style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: CHANNEL_COLORS[esc.channel] || '#94A3B8', flexShrink: 0 }} />
+              <span style={{ fontSize: 10, color: '#94A3B8', fontFamily: 'Inter, sans-serif' }}>{esc.channel}</span>
             </div>
-            <span
-              style={{
-                fontSize: 12,
-                fontWeight: 600,
-                color: esc.score >= 70 ? '#DC2626' : esc.score >= 45 ? '#D97706' : '#059669',
-                fontFamily: 'Inter, sans-serif',
-              }}
-            >
+            <span style={{ fontSize: 11, fontWeight: 600, color: esc.score >= 70 ? '#EF4444' : esc.score >= 45 ? '#F59E0B' : '#10B981', fontFamily: 'Inter, sans-serif' }}>
               {esc.score}
             </span>
-            <span
-              style={{
-                fontSize: 11,
-                color: ageDays > 2 ? '#DC2626' : '#6B5E8B',
-                fontFamily: 'Inter, sans-serif',
-                fontWeight: ageDays > 2 ? 600 : 400,
-              }}
-            >
+            <span style={{ fontSize: 10, color: ageDays > 2 ? '#EF4444' : '#94A3B8', fontFamily: 'Inter, sans-serif', fontWeight: ageDays > 2 ? 600 : 400 }}>
               {ageDays}d
             </span>
-            <span
-              style={{
-                fontSize: 10,
-                fontWeight: 500,
-                color: sColors.text,
-                backgroundColor: sColors.bg,
-                borderRadius: 12,
-                padding: '2px 8px',
-                textAlign: 'center',
-                alignSelf: 'center',
-                fontFamily: 'Inter, sans-serif',
-              }}
-            >
+            <span style={{ fontSize: 9, fontWeight: 500, color: sColors.text, backgroundColor: sColors.bg, borderRadius: 12, padding: '2px 7px', textAlign: 'center', alignSelf: 'center', fontFamily: 'Inter, sans-serif' }}>
               {esc.current_status}
             </span>
           </div>
@@ -211,77 +140,22 @@ function RecentEscalationTable({
   )
 }
 
-function RecentSection({
-  title,
-  subtitle,
-  badge,
-  rows,
-  emptyLabel,
-  badgeColor,
-}: {
-  title: string
-  subtitle: string
-  badge: string
-  rows: EscalationRow[]
-  emptyLabel: string
-  badgeColor: string
+function RecentSection({ title, subtitle, badge, rows, emptyLabel, badgeColor }: {
+  title: string; subtitle: string; badge: string; rows: EscalationRow[]; emptyLabel: string; badgeColor: string
 }) {
   return (
-    <div
-      style={{
-        backgroundColor: 'white',
-        borderRadius: 12,
-        border: '1px solid #EDE8FD',
-        overflow: 'hidden',
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '14px 16px 12px',
-          borderBottom: '1px solid #F3F4F6',
-        }}
-      >
+    <div style={{ backgroundColor: '#1A1F3A', borderRadius: 12, border: '1px solid #2D3561', overflow: 'hidden' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 14px', borderBottom: '1px solid #2D3561' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span
-              style={{
-                fontWeight: 600,
-                fontSize: 13,
-                color: '#1A0A2B',
-                fontFamily: 'Inter, sans-serif',
-              }}
-            >
-              {title}
-            </span>
-            <span
-              style={{
-                fontSize: 10,
-                fontWeight: 600,
-                color: badgeColor,
-                backgroundColor: badgeColor + '18',
-                borderRadius: 20,
-                padding: '2px 8px',
-                fontFamily: 'Inter, sans-serif',
-              }}
-            >
+            <span style={{ fontWeight: 600, fontSize: 13, color: '#F1F5F9', fontFamily: 'Inter, sans-serif' }}>{title}</span>
+            <span style={{ fontSize: 10, fontWeight: 600, color: badgeColor, backgroundColor: badgeColor + '22', borderRadius: 20, padding: '2px 8px', fontFamily: 'Inter, sans-serif' }}>
               {badge}
             </span>
           </div>
-          <div style={{ fontSize: 11, color: '#9E94BC', fontFamily: 'Inter, sans-serif', marginTop: 2 }}>
-            {subtitle}
-          </div>
+          <div style={{ fontSize: 11, color: '#475569', fontFamily: 'Inter, sans-serif', marginTop: 2 }}>{subtitle}</div>
         </div>
-        <span
-          style={{
-            fontSize: 18,
-            fontWeight: 700,
-            color: rows.length > 0 ? badgeColor : '#D1D5DB',
-            fontFamily: 'Inter, sans-serif',
-          }}
-        >
+        <span style={{ fontSize: 18, fontWeight: 700, color: rows.length > 0 ? badgeColor : '#2D3561', fontFamily: 'Inter, sans-serif' }}>
           {rows.length}
         </span>
       </div>
@@ -302,7 +176,7 @@ export default function OverviewPage() {
     today: [], thisWeek: [], thisMonth: [],
   })
 
-  const loadStats = useCallback((preset: DatePreset, from?: string, to?: string) => {
+  const loadStats = useCallback((preset: DatePreset, from?: string) => {
     let since: string | undefined
     if (preset !== 'all' && preset !== 'custom') {
       since = getPresetSince(preset)
@@ -336,37 +210,27 @@ export default function OverviewPage() {
   }
 
   const handleCustomApply = () => {
-    if (customFrom) loadStats('custom', customFrom, customTo)
+    if (customFrom) loadStats('custom', customFrom)
   }
 
   const displayStats = stats || FALLBACK_STATS
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#F6F3FF' }}>
-      <TopNav />
+    <div style={{ minHeight: '100vh', backgroundColor: '#0F1128' }}>
+      <TopNav topPerformers={displayStats.topPerformers} />
 
-      {/* Content shifted right of sidebar */}
       <div style={{ marginLeft: SIDEBAR_WIDTH, minHeight: '100vh' }}>
         <FilterBar />
 
         {error && (
-          <div style={{ backgroundColor: '#FDEAEA', color: '#E53030', fontSize: 12, padding: '8px 20px', borderBottom: '1px solid #FCA5A5', fontFamily: 'Inter, sans-serif' }}>
+          <div style={{ backgroundColor: 'rgba(239,68,68,0.15)', color: '#EF4444', fontSize: 12, padding: '8px 20px', borderBottom: '1px solid rgba(239,68,68,0.3)', fontFamily: 'Inter, sans-serif' }}>
             ⚠ {error}
           </div>
         )}
 
         {/* Date range filter bar */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            padding: '10px 20px',
-            backgroundColor: 'white',
-            borderBottom: '1px solid #EDE8FD',
-          }}
-        >
-          <span style={{ fontSize: 11, color: '#9E94BC', fontFamily: 'Inter, sans-serif', fontWeight: 600, marginRight: 4, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', backgroundColor: '#1A1F3A', borderBottom: '1px solid #2D3561' }}>
+          <span style={{ fontSize: 10, color: '#475569', fontFamily: 'Inter, sans-serif', fontWeight: 600, marginRight: 4, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
             Time range
           </span>
           {PRESETS.map(p => (
@@ -374,16 +238,12 @@ export default function OverviewPage() {
               key={p.value}
               onClick={() => handlePreset(p.value)}
               style={{
-                fontSize: 11,
-                fontWeight: datePreset === p.value ? 700 : 400,
+                fontSize: 11, fontWeight: datePreset === p.value ? 700 : 400,
                 fontFamily: 'Inter, sans-serif',
-                color: datePreset === p.value ? '#7308E3' : '#6B5E8B',
-                backgroundColor: datePreset === p.value ? '#EDE8FD' : 'transparent',
-                border: datePreset === p.value ? '1.5px solid #C4B5FD' : '1px solid #EDE8FD',
-                borderRadius: 20,
-                padding: '4px 12px',
-                cursor: 'pointer',
-                transition: 'all 150ms',
+                color: datePreset === p.value ? 'white' : '#94A3B8',
+                backgroundColor: datePreset === p.value ? '#4F46E5' : 'transparent',
+                border: datePreset === p.value ? 'none' : '1px solid #2D3561',
+                borderRadius: 20, padding: '3px 12px', cursor: 'pointer', transition: 'all 150ms',
               }}
             >
               {p.label}
@@ -392,48 +252,17 @@ export default function OverviewPage() {
           {datePreset === 'custom' && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 8 }}>
               <input
-                type="date"
-                value={customFrom}
-                onChange={e => setCustomFrom(e.target.value)}
-                style={{
-                  fontSize: 11,
-                  fontFamily: 'Inter, sans-serif',
-                  border: '1px solid #EDE8FD',
-                  borderRadius: 6,
-                  padding: '4px 8px',
-                  color: '#1A0A2B',
-                  outline: 'none',
-                }}
+                type="date" value={customFrom} onChange={e => setCustomFrom(e.target.value)}
+                style={{ fontSize: 11, fontFamily: 'Inter, sans-serif', border: '1px solid #2D3561', borderRadius: 6, padding: '4px 8px', color: '#F1F5F9', background: '#0F1128', outline: 'none' }}
               />
-              <span style={{ fontSize: 11, color: '#9E94BC' }}>to</span>
+              <span style={{ fontSize: 11, color: '#475569' }}>to</span>
               <input
-                type="date"
-                value={customTo}
-                onChange={e => setCustomTo(e.target.value)}
-                style={{
-                  fontSize: 11,
-                  fontFamily: 'Inter, sans-serif',
-                  border: '1px solid #EDE8FD',
-                  borderRadius: 6,
-                  padding: '4px 8px',
-                  color: '#1A0A2B',
-                  outline: 'none',
-                }}
+                type="date" value={customTo} onChange={e => setCustomTo(e.target.value)}
+                style={{ fontSize: 11, fontFamily: 'Inter, sans-serif', border: '1px solid #2D3561', borderRadius: 6, padding: '4px 8px', color: '#F1F5F9', background: '#0F1128', outline: 'none' }}
               />
               <button
-                onClick={handleCustomApply}
-                disabled={!customFrom}
-                style={{
-                  fontSize: 11,
-                  fontWeight: 600,
-                  fontFamily: 'Inter, sans-serif',
-                  color: 'white',
-                  backgroundColor: customFrom ? '#7308E3' : '#D9D0F8',
-                  border: 'none',
-                  borderRadius: 6,
-                  padding: '5px 12px',
-                  cursor: customFrom ? 'pointer' : 'not-allowed',
-                }}
+                onClick={handleCustomApply} disabled={!customFrom}
+                style={{ fontSize: 11, fontWeight: 600, fontFamily: 'Inter, sans-serif', color: 'white', backgroundColor: customFrom ? '#4F46E5' : '#2D3561', border: 'none', borderRadius: 6, padding: '5px 12px', cursor: customFrom ? 'pointer' : 'not-allowed' }}
               >
                 Apply
               </button>
@@ -441,30 +270,18 @@ export default function OverviewPage() {
           )}
           <div style={{ flex: 1 }} />
           {datePreset !== 'all' && (
-            <button
-              onClick={() => handlePreset('all')}
-              style={{
-                fontSize: 11,
-                color: '#7308E3',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                fontFamily: 'Inter, sans-serif',
-                fontWeight: 500,
-                textDecoration: 'underline',
-              }}
-            >
+            <button onClick={() => handlePreset('all')} style={{ fontSize: 11, color: '#4F46E5', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontWeight: 500, textDecoration: 'underline' }}>
               Reset
             </button>
           )}
         </div>
 
-        <main style={{ padding: '16px 20px 24px' }}>
+        <main style={{ padding: '12px 16px 24px' }}>
           {/* KPI Strip */}
           {loading ? (
-            <div className="w-full bg-white border-b grid grid-cols-4" style={{ borderBottomColor: '#EDE8FD', borderRadius: 12, overflow: 'hidden' }}>
+            <div className="w-full grid grid-cols-4" style={{ borderRadius: 12, overflow: 'hidden', border: '1px solid #2D3561' }}>
               {[1, 2, 3, 4].map(i => (
-                <div key={i} style={{ borderRight: i < 4 ? '1px solid #EDE8FD' : 'none' }}>
+                <div key={i} style={{ borderRight: i < 4 ? '1px solid #2D3561' : 'none' }}>
                   <SkeletonKpi />
                 </div>
               ))}
@@ -473,67 +290,67 @@ export default function OverviewPage() {
             <KpiStrip stats={displayStats} />
           )}
 
+          {/* Response/CSAT strip */}
+          <div style={{ marginTop: 12 }}>
+            <ResponseCsatStrip data={displayStats.responseCsat} />
+          </div>
+
+          {/* Tickets trend */}
+          <div style={{ marginTop: 12 }}>
+            <TicketsTrendChart data={displayStats.ticketsTrend} />
+          </div>
+
           {/* Row 1: Score distribution + Donuts */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 14, marginTop: 16, alignItems: 'start' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 260px', gap: 12, marginTop: 12, alignItems: 'start' }}>
             <ScoreDistChart data={displayStats.scoreDistribution} />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <ChannelDonut data={displayStats.byChannel} />
               <TierDonut data={displayStats.byTier} />
             </div>
           </div>
 
-          {/* Row 2: SLA Breach + Aged Cases + Ownership */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14, marginTop: 14 }}>
+          {/* Root cause analysis — full width */}
+          <div style={{ marginTop: 12 }}>
+            <RootCauseChart data={displayStats.rootCauseData} />
+          </div>
+
+          {/* Row 2: SLA Breach + Aged Cases + Resolution Timeline */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginTop: 12 }}>
             <SlaBreachBars data={displayStats.slaBreachBySegment} />
             <AgedCases cases={displayStats.oldestCases} />
-            <OwnershipLoad owners={displayStats.ownershipLoad} />
+            <ResolutionTimeline cases={displayStats.openHighPriorityForTimeline} />
           </div>
 
-          {/* Row 3: Avg score chart */}
-          <div style={{ marginTop: 14 }}>
-            <AvgScoreChart data={displayStats.avgScoreBySegment} />
-          </div>
-
-          {/* Row 4: Recent escalations */}
-          <div style={{ marginTop: 20 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-              <span
-                style={{
-                  fontWeight: 600,
-                  fontSize: 14,
-                  color: '#1A0A2B',
-                  fontFamily: 'Inter, sans-serif',
-                }}
-              >
-                Recent Escalations
-              </span>
-              <div style={{ flex: 1, height: 1, backgroundColor: '#EDE8FD' }} />
+          {/* Row 3: B2B vs B2C + (AvgScore + OwnershipLoad) */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 12 }}>
+            <B2BvsB2C data={displayStats.b2bVsB2c} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <AvgScoreChart data={displayStats.avgScoreBySegment} />
+              <OwnershipLoad owners={displayStats.ownershipLoad} />
             </div>
+          </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }}>
+          {/* Recent escalations */}
+          <div style={{ marginTop: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+              <span style={{ fontWeight: 600, fontSize: 13, color: '#F1F5F9', fontFamily: 'Inter, sans-serif' }}>Recent Escalations</span>
+              <div style={{ flex: 1, height: 1, backgroundColor: '#2D3561' }} />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
               <RecentSection
-                title="Today"
-                subtitle="Raised since midnight"
-                badge="NEW"
+                title="Today" subtitle="Raised since midnight" badge="NEW"
                 rows={recentLoading ? [] : recent.today}
-                emptyLabel="No escalations raised today"
-                badgeColor="#DC2626"
+                emptyLabel="No escalations raised today" badgeColor="#EF4444"
               />
               <RecentSection
-                title="This Week"
-                subtitle="Mon – yesterday"
-                badge="WEEK"
+                title="This Week" subtitle="Mon – yesterday" badge="WEEK"
                 rows={recentLoading ? [] : recent.thisWeek}
-                emptyLabel="No escalations this week (excl. today)"
-                badgeColor="#D97706"
+                emptyLabel="No escalations this week (excl. today)" badgeColor="#F59E0B"
               />
               <RecentSection
-                title="This Month"
-                subtitle="1st – last week"
-                badge="MONTH"
+                title="This Month" subtitle="1st – last week" badge="MONTH"
                 rows={recentLoading ? [] : recent.thisMonth}
-                emptyLabel="No escalations this month (excl. this week)"
-                badgeColor="#4F46E5"
+                emptyLabel="No escalations this month (excl. this week)" badgeColor="#4F46E5"
               />
             </div>
           </div>

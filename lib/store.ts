@@ -18,6 +18,7 @@ const defaultFilters: FilterState = {
   channel: null,
   tier: null,
   owner: null,
+  b2bOrB2c: null,
   scoreRange: null,
   sortBy: 'score_desc',
   search: '',
@@ -32,6 +33,7 @@ function syncToUrl(state: FilterState) {
   if (state.channel) params.set('channel', state.channel)
   if (state.tier) params.set('tier', state.tier)
   if (state.owner) params.set('owner', state.owner)
+  if (state.b2bOrB2c) params.set('b2bOrB2c', state.b2bOrB2c)
   if (state.scoreRange) params.set('scoreRange', state.scoreRange.join(','))
   if (state.sortBy !== 'score_desc') params.set('sortBy', state.sortBy)
   if (state.search) params.set('search', state.search)
@@ -55,6 +57,8 @@ function readFromUrl(): Partial<FilterState> {
   if (tier) result.tier = tier
   const owner = params.get('owner')
   if (owner) result.owner = owner
+  const b2bOrB2c = params.get('b2bOrB2c')
+  if (b2bOrB2c) result.b2bOrB2c = b2bOrB2c
   const scoreRange = params.get('scoreRange')
   if (scoreRange) {
     const [min, max] = scoreRange.split(',').map(Number)

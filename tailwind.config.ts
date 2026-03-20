@@ -27,6 +27,24 @@ const config: Config = {
           warning:   '#D97706',
           success:   '#059669',
         },
+        navy: {
+          DEFAULT: '#0F1128',
+          card:    '#1A1F3A',
+          border:  '#2D3561',
+          deep:    '#080A1A',
+          hover:   '#1E2952',
+        },
+        indigo: {
+          accent: '#4F46E5',
+          light:  '#6366F1',
+          dark:   '#3730A3',
+        },
+        cyan: {
+          chart: '#22D3EE',
+        },
+        magenta: {
+          chart: '#D946EF',
+        },
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
@@ -37,9 +55,10 @@ const config: Config = {
         pill: '20px',
       },
       boxShadow: {
-        card:   '0 1px 4px rgba(115,8,227,0.06)',
+        card:      '0 1px 4px rgba(115,8,227,0.06)',
         'card-md': '0 4px 16px rgba(115,8,227,0.10)',
-        glow:   '0 0 8px rgba(115,8,227,0.8)',
+        glow:      '0 0 8px rgba(115,8,227,0.8)',
+        'navy-lg': '0 8px 32px rgba(0,0,0,0.4)',
       },
       animation: {
         'ping-slow': 'ping 2s cubic-bezier(0, 0, 0.2, 1) infinite',

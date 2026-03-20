@@ -26,6 +26,18 @@ export interface EscalationRow {
   age_hours: number
   created_at: string
   updated_at: string
+  // New columns
+  root_cause: string | null
+  b2b_or_b2c: 'B2B' | 'B2C' | null
+  resolution_deadline: string | null
+  resolved_at: string | null
+  resolution_hours: number | null
+  max_resolution_hours: number | null
+  csat_score: number | null
+  response_sent_at: string | null
+  first_response_hours: number | null
+  resolved_by: string | null
+  employee_id: string | null
 }
 
 export interface ScoredEscalation extends EscalationRow {
@@ -87,6 +99,22 @@ export interface Stats {
   }
   oldestCases: EscalationRow[]
   ownershipLoad: Array<{ owner: string; count: number; highCount: number }>
+  // New stats
+  rootCauseData: Array<{ cause: string; count: number; avgResolutionHours: number; b2bPct: number }>
+  b2bVsB2c: {
+    b2bCount: number
+    b2cCount: number
+    byPriority: Array<{ priority: string; b2b: number; b2c: number }>
+  }
+  responseCsat: {
+    lastMonthAvgResponseHours: number
+    currentMonthAvgResponseHours: number
+    lastMonthCsat: number
+    currentMonthCsat: number
+  }
+  openHighPriorityForTimeline: EscalationRow[]
+  ticketsTrend: Array<{ period: string; raised: number; resolved: number }>
+  topPerformers: Array<{ name: string; resolved: number; employeeId: string | null }>
 }
 
 export interface FilterState {
@@ -95,6 +123,7 @@ export interface FilterState {
   channel: string | null
   tier: string | null
   owner: string | null
+  b2bOrB2c: string | null
   scoreRange: [number, number] | null
   sortBy: 'score_desc' | 'age_desc' | 'age_asc' | 'account_asc'
   search: string
